@@ -1,0 +1,5 @@
+model,class,accuracy,weighted_f1,macro_f1,precision,recall,f1
+finbert,overall,0.6667,0.5556,0.5556,,,
+finbert,negative,,,,1.0,1.0,1.0
+finbert,neutral,,,,0.5,1.0,0.6667
+finbert,positive,,,,0.0,0.0,0.0

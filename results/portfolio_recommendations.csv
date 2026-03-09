@@ -1,0 +1,6 @@
+generated_at,ticker,recommendation,signal_score,confidence,headline_count,confident_headline_count,top_positive_keywords,top_negative_keywords,source_breakdown,reasoning
+2026-03-09T00:01:02.062660+00:00,NVDA,BUY,0.71,0.84,16,13,"earnings, beat",margin,"{'sec_edgar': 8, 'yfinance': 8}",Strong positive signal.
+2026-03-09T00:01:02.062673+00:00,AAPL,BUY,0.45,0.79,12,10,"guidance, upgrade",investigation,"{'newsapi': 6, 'yfinance': 6}",Broadly positive coverage.
+2026-03-09T00:01:02.062676+00:00,MSFT,HOLD,0.12,0.71,9,7,"cloud, growth",layoffs,"{'sec_edgar': 5, 'yfinance': 4}","Mixed signals, net neutral."
+2026-03-09T00:01:02.062678+00:00,BAC,HOLD,-0.05,0.65,7,4,,"dividend, cut",{'yfinance': 7},Slight negative bias.
+2026-03-09T00:01:02.062680+00:00,GS,SELL,-0.38,0.76,11,9,,"investigation, miss","{'sec_edgar': 6, 'newsapi': 5}",Dominant negative sentiment.

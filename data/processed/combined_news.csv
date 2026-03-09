@@ -1,0 +1,501 @@
+date,ticker,headline,source
+2023-12-30,TSLA,TSLA profit margins under pressure,fnspid
+2023-12-26,AAPL,AAPL misses revenue estimates by 8%,fnspid
+2023-12-25,AMZN,AMZN faces SEC investigation over accounting,fnspid
+2023-12-23,META,META announces share buyback programme,fnspid
+2023-12-19,TSLA,TSLA faces antitrust investigation,fnspid
+2023-12-17,TSLA,TSLA faces antitrust investigation,fnspid
+2023-12-15,META,META announces share buyback programme,fnspid
+2023-12-15,AMZN,AMZN misses revenue estimates by 8%,fnspid
+2023-12-12,AMZN,AMZN beats earnings expectations,fnspid
+2023-12-09,MSFT,MSFT shares fall on weak guidance,fnspid
+2023-12-09,MSFT,MSFT faces antitrust investigation,fnspid
+2023-12-08,NVDA,NVDA announces major cost cutting programme,fnspid
+2023-12-05,GS,GS announces share buyback programme,fnspid
+2023-12-04,META,META profit margins under pressure,fnspid
+2023-12-04,META,META stock upgraded by Goldman Sachs,fnspid
+2023-12-03,NVDA,NVDA announces share buyback programme,fnspid
+2023-12-02,AMZN,AMZN profit margins under pressure,fnspid
+2023-12-02,JPM,JPM stock upgraded by Goldman Sachs,fnspid
+2023-11-28,GOOGL,GOOGL announces major cost cutting programme,fnspid
+2023-11-27,NVDA,NVDA beats earnings expectations,fnspid
+2023-11-26,META,META faces SEC investigation over accounting,fnspid
+2023-11-23,GS,GS misses revenue estimates by 8%,fnspid
+2023-11-22,MSFT,MSFT announces share buyback programme,fnspid
+2023-11-22,GS,GS stock upgraded by Goldman Sachs,fnspid
+2023-11-18,NVDA,NVDA profit margins under pressure,fnspid
+2023-11-18,TSLA,TSLA CEO resigns amid restructuring,fnspid
+2023-11-17,GOOGL,GOOGL cuts dividend amid cash concerns,fnspid
+2023-11-17,BAC,BAC announces major cost cutting programme,fnspid
+2023-11-16,BAC,BAC CEO resigns amid restructuring,fnspid
+2023-11-16,META,META shares fall on weak guidance,fnspid
+2023-11-15,NVDA,NVDA reports record quarterly earnings,fnspid
+2023-11-14,NVDA,NVDA faces SEC investigation over accounting,fnspid
+2023-11-12,AMZN,AMZN beats earnings expectations,fnspid
+2023-11-11,META,META CEO resigns amid restructuring,fnspid
+2023-11-11,BAC,BAC beats earnings expectations,fnspid
+2023-11-11,NVDA,NVDA faces SEC investigation over accounting,fnspid
+2023-11-11,JPM,JPM completes acquisition of rival firm,fnspid
+2023-11-10,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2023-11-10,TSLA,TSLA faces SEC investigation over accounting,fnspid
+2023-11-09,MSFT,MSFT reports record quarterly earnings,fnspid
+2023-11-08,AMZN,AMZN faces SEC investigation over accounting,fnspid
+2023-11-07,META,META shares fall on weak guidance,fnspid
+2023-11-06,AAPL,AAPL stock upgraded by Goldman Sachs,fnspid
+2023-11-05,MSFT,MSFT beats earnings expectations,fnspid
+2023-11-03,AMZN,AMZN raises full year guidance,fnspid
+2023-11-03,GS,GS announces share buyback programme,fnspid
+2023-11-02,BAC,BAC stock upgraded by Goldman Sachs,fnspid
+2023-11-01,JPM,JPM shares fall on weak guidance,fnspid
+2023-10-30,MSFT,MSFT reports record quarterly earnings,fnspid
+2023-10-30,MSFT,MSFT announces major cost cutting programme,fnspid
+2023-10-28,BAC,BAC profit margins under pressure,fnspid
+2023-10-28,AMZN,AMZN reports stronger than expected revenue,fnspid
+2023-10-26,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2023-10-23,GOOGL,GOOGL profit margins under pressure,fnspid
+2023-10-23,NVDA,NVDA faces antitrust investigation,fnspid
+2023-10-21,AAPL,AAPL misses revenue estimates by 8%,fnspid
+2023-10-21,TSLA,TSLA beats earnings expectations,fnspid
+2023-10-19,JPM,JPM CEO resigns amid restructuring,fnspid
+2023-10-19,JPM,JPM announces major cost cutting programme,fnspid
+2023-10-18,JPM,JPM faces antitrust investigation,fnspid
+2023-10-17,AMZN,AMZN profit margins under pressure,fnspid
+2023-10-17,JPM,JPM stock upgraded by Goldman Sachs,fnspid
+2023-10-15,AMZN,AMZN stock upgraded by Goldman Sachs,fnspid
+2023-10-13,MSFT,MSFT shares fall on weak guidance,fnspid
+2023-10-11,BAC,BAC misses revenue estimates by 8%,fnspid
+2023-10-06,JPM,JPM stock upgraded by Goldman Sachs,fnspid
+2023-10-05,MSFT,MSFT raises full year guidance,fnspid
+2023-10-03,JPM,JPM announces major cost cutting programme,fnspid
+2023-10-01,JPM,JPM CEO resigns amid restructuring,fnspid
+2023-09-27,META,META reports record quarterly earnings,fnspid
+2023-09-18,AMZN,AMZN cuts dividend amid cash concerns,fnspid
+2023-09-17,GS,GS faces antitrust investigation,fnspid
+2023-09-17,META,META reports record quarterly earnings,fnspid
+2023-09-14,NVDA,NVDA stock upgraded by Goldman Sachs,fnspid
+2023-09-13,GS,GS raises full year guidance,fnspid
+2023-09-13,AAPL,AAPL faces antitrust investigation,fnspid
+2023-09-06,AMZN,AMZN faces antitrust investigation,fnspid
+2023-09-03,BAC,BAC shares fall on weak guidance,fnspid
+2023-09-03,AAPL,AAPL misses revenue estimates by 8%,fnspid
+2023-09-03,BAC,BAC beats earnings expectations,fnspid
+2023-09-03,GS,GS faces SEC investigation over accounting,fnspid
+2023-09-02,NVDA,NVDA completes acquisition of rival firm,fnspid
+2023-09-01,TSLA,TSLA reports stronger than expected revenue,fnspid
+2023-08-28,GOOGL,GOOGL completes acquisition of rival firm,fnspid
+2023-08-27,TSLA,TSLA faces SEC investigation over accounting,fnspid
+2023-08-26,JPM,JPM stock upgraded by Goldman Sachs,fnspid
+2023-08-25,NVDA,NVDA beats earnings expectations,fnspid
+2023-08-24,NVDA,NVDA announces share buyback programme,fnspid
+2023-08-22,NVDA,NVDA faces SEC investigation over accounting,fnspid
+2023-08-22,AAPL,AAPL reports record quarterly earnings,fnspid
+2023-08-22,BAC,BAC beats earnings expectations,fnspid
+2023-08-21,TSLA,TSLA faces antitrust investigation,fnspid
+2023-08-21,BAC,BAC faces antitrust investigation,fnspid
+2023-08-19,JPM,JPM profit margins under pressure,fnspid
+2023-08-17,AMZN,AMZN reports record quarterly earnings,fnspid
+2023-08-17,BAC,BAC announces major cost cutting programme,fnspid
+2023-08-16,META,META announces share buyback programme,fnspid
+2023-08-14,MSFT,MSFT beats earnings expectations,fnspid
+2023-08-13,AAPL,AAPL stock upgraded by Goldman Sachs,fnspid
+2023-08-12,META,META CEO resigns amid restructuring,fnspid
+2023-08-06,JPM,JPM shares fall on weak guidance,fnspid
+2023-08-06,BAC,BAC faces SEC investigation over accounting,fnspid
+2023-08-04,MSFT,MSFT announces share buyback programme,fnspid
+2023-08-03,NVDA,NVDA beats earnings expectations,fnspid
+2023-08-01,BAC,BAC shares fall on weak guidance,fnspid
+2023-07-29,META,META reports record quarterly earnings,fnspid
+2023-07-29,META,META faces antitrust investigation,fnspid
+2023-07-29,GOOGL,GOOGL announces share buyback programme,fnspid
+2023-07-28,MSFT,MSFT CEO resigns amid restructuring,fnspid
+2023-07-26,AMZN,AMZN misses revenue estimates by 8%,fnspid
+2023-07-25,BAC,BAC stock upgraded by Goldman Sachs,fnspid
+2023-07-22,AAPL,AAPL shares fall on weak guidance,fnspid
+2023-07-21,AAPL,AAPL reports record quarterly earnings,fnspid
+2023-07-21,GS,GS cuts dividend amid cash concerns,fnspid
+2023-07-20,GS,GS shares fall on weak guidance,fnspid
+2023-07-20,BAC,BAC misses revenue estimates by 8%,fnspid
+2023-07-20,GS,GS CEO resigns amid restructuring,fnspid
+2023-07-19,GOOGL,GOOGL faces SEC investigation over accounting,fnspid
+2023-07-18,TSLA,TSLA announces major cost cutting programme,fnspid
+2023-07-18,BAC,BAC stock upgraded by Goldman Sachs,fnspid
+2023-07-17,AMZN,AMZN faces SEC investigation over accounting,fnspid
+2023-07-16,BAC,BAC stock upgraded by Goldman Sachs,fnspid
+2023-07-14,JPM,JPM profit margins under pressure,fnspid
+2023-07-14,BAC,BAC completes acquisition of rival firm,fnspid
+2023-07-13,MSFT,MSFT profit margins under pressure,fnspid
+2023-07-12,BAC,BAC misses revenue estimates by 8%,fnspid
+2023-07-11,GOOGL,GOOGL cuts dividend amid cash concerns,fnspid
+2023-07-09,TSLA,TSLA stock upgraded by Goldman Sachs,fnspid
+2023-07-08,GS,GS CEO resigns amid restructuring,fnspid
+2023-07-07,TSLA,TSLA reports record quarterly earnings,fnspid
+2023-07-07,BAC,BAC announces share buyback programme,fnspid
+2023-07-06,META,META announces major cost cutting programme,fnspid
+2023-07-04,AAPL,AAPL faces SEC investigation over accounting,fnspid
+2023-07-04,MSFT,MSFT profit margins under pressure,fnspid
+2023-06-28,NVDA,NVDA announces major cost cutting programme,fnspid
+2023-06-28,TSLA,TSLA completes acquisition of rival firm,fnspid
+2023-06-23,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2023-06-20,META,META announces share buyback programme,fnspid
+2023-06-20,META,META shares fall on weak guidance,fnspid
+2023-06-18,JPM,JPM announces major cost cutting programme,fnspid
+2023-06-17,BAC,BAC reports record quarterly earnings,fnspid
+2023-06-16,GOOGL,GOOGL cuts dividend amid cash concerns,fnspid
+2023-06-15,AAPL,AAPL announces share buyback programme,fnspid
+2023-06-14,GS,GS cuts dividend amid cash concerns,fnspid
+2023-06-08,BAC,BAC shares fall on weak guidance,fnspid
+2023-06-05,GOOGL,GOOGL reports record quarterly earnings,fnspid
+2023-06-04,GS,GS faces antitrust investigation,fnspid
+2023-06-03,GS,GS misses revenue estimates by 8%,fnspid
+2023-06-02,AMZN,AMZN announces share buyback programme,fnspid
+2023-06-01,META,META stock upgraded by Goldman Sachs,fnspid
+2023-05-28,BAC,BAC faces SEC investigation over accounting,fnspid
+2023-05-26,GS,GS shares fall on weak guidance,fnspid
+2023-05-21,GOOGL,GOOGL completes acquisition of rival firm,fnspid
+2023-05-20,AAPL,AAPL faces SEC investigation over accounting,fnspid
+2023-05-17,MSFT,MSFT stock upgraded by Goldman Sachs,fnspid
+2023-05-16,JPM,JPM completes acquisition of rival firm,fnspid
+2023-05-14,NVDA,NVDA profit margins under pressure,fnspid
+2023-05-13,JPM,JPM profit margins under pressure,fnspid
+2023-05-13,GOOGL,GOOGL beats earnings expectations,fnspid
+2023-05-11,TSLA,TSLA completes acquisition of rival firm,fnspid
+2023-05-10,AMZN,AMZN beats earnings expectations,fnspid
+2023-05-10,BAC,BAC stock upgraded by Goldman Sachs,fnspid
+2023-05-09,GOOGL,GOOGL faces SEC investigation over accounting,fnspid
+2023-05-02,GOOGL,GOOGL profit margins under pressure,fnspid
+2023-04-30,AMZN,AMZN announces major cost cutting programme,fnspid
+2023-04-30,AMZN,AMZN completes acquisition of rival firm,fnspid
+2023-04-30,AAPL,AAPL CEO resigns amid restructuring,fnspid
+2023-04-30,META,META shares fall on weak guidance,fnspid
+2023-04-27,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2023-04-26,META,META faces SEC investigation over accounting,fnspid
+2023-04-26,GOOGL,GOOGL misses revenue estimates by 8%,fnspid
+2023-04-23,GS,GS completes acquisition of rival firm,fnspid
+2023-04-22,AAPL,AAPL faces antitrust investigation,fnspid
+2023-04-21,AMZN,AMZN announces major cost cutting programme,fnspid
+2023-04-21,TSLA,TSLA raises full year guidance,fnspid
+2023-04-18,GOOGL,GOOGL announces share buyback programme,fnspid
+2023-04-18,BAC,BAC raises full year guidance,fnspid
+2023-04-16,GS,GS profit margins under pressure,fnspid
+2023-04-15,MSFT,MSFT reports record quarterly earnings,fnspid
+2023-04-13,TSLA,TSLA announces share buyback programme,fnspid
+2023-04-12,NVDA,NVDA beats earnings expectations,fnspid
+2023-04-10,BAC,BAC raises full year guidance,fnspid
+2023-04-10,JPM,JPM reports stronger than expected revenue,fnspid
+2023-04-07,JPM,JPM faces antitrust investigation,fnspid
+2023-04-01,AMZN,AMZN cuts dividend amid cash concerns,fnspid
+2023-03-30,GS,GS announces major cost cutting programme,fnspid
+2023-03-30,BAC,BAC cuts dividend amid cash concerns,fnspid
+2023-03-29,JPM,JPM raises full year guidance,fnspid
+2023-03-29,GOOGL,GOOGL misses revenue estimates by 8%,fnspid
+2023-03-29,TSLA,TSLA cuts dividend amid cash concerns,fnspid
+2023-03-28,AAPL,AAPL faces SEC investigation over accounting,fnspid
+2023-03-25,NVDA,NVDA cuts dividend amid cash concerns,fnspid
+2023-03-23,GOOGL,GOOGL shares fall on weak guidance,fnspid
+2023-03-23,TSLA,TSLA cuts dividend amid cash concerns,fnspid
+2023-03-20,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2023-03-18,AMZN,AMZN CEO resigns amid restructuring,fnspid
+2023-03-18,MSFT,MSFT profit margins under pressure,fnspid
+2023-03-15,GS,GS completes acquisition of rival firm,fnspid
+2023-03-14,NVDA,NVDA reports stronger than expected revenue,fnspid
+2023-03-12,NVDA,NVDA CEO resigns amid restructuring,fnspid
+2023-03-10,TSLA,TSLA faces SEC investigation over accounting,fnspid
+2023-03-10,MSFT,MSFT profit margins under pressure,fnspid
+2023-03-09,MSFT,MSFT shares fall on weak guidance,fnspid
+2023-03-08,BAC,BAC faces SEC investigation over accounting,fnspid
+2023-03-07,GS,GS reports record quarterly earnings,fnspid
+2023-03-02,GS,GS reports stronger than expected revenue,fnspid
+2023-03-01,MSFT,MSFT faces SEC investigation over accounting,fnspid
+2023-03-01,MSFT,MSFT cuts dividend amid cash concerns,fnspid
+2023-03-01,GOOGL,GOOGL faces antitrust investigation,fnspid
+2023-02-28,NVDA,NVDA cuts dividend amid cash concerns,fnspid
+2023-02-27,GOOGL,GOOGL faces antitrust investigation,fnspid
+2023-02-26,GOOGL,GOOGL CEO resigns amid restructuring,fnspid
+2023-02-25,GS,GS beats earnings expectations,fnspid
+2023-02-25,AMZN,AMZN stock upgraded by Goldman Sachs,fnspid
+2023-02-23,GOOGL,GOOGL reports record quarterly earnings,fnspid
+2023-02-23,JPM,JPM profit margins under pressure,fnspid
+2023-02-22,MSFT,MSFT beats earnings expectations,fnspid
+2023-02-22,AAPL,AAPL completes acquisition of rival firm,fnspid
+2023-02-21,AMZN,AMZN reports stronger than expected revenue,fnspid
+2023-02-18,MSFT,MSFT announces major cost cutting programme,fnspid
+2023-02-17,BAC,BAC CEO resigns amid restructuring,fnspid
+2023-02-17,MSFT,MSFT reports record quarterly earnings,fnspid
+2023-02-15,TSLA,TSLA announces share buyback programme,fnspid
+2023-02-14,BAC,BAC cuts dividend amid cash concerns,fnspid
+2023-02-12,GS,GS reports record quarterly earnings,fnspid
+2023-02-10,AMZN,AMZN faces SEC investigation over accounting,fnspid
+2023-02-09,GS,GS misses revenue estimates by 8%,fnspid
+2023-02-04,GS,GS faces SEC investigation over accounting,fnspid
+2023-02-02,NVDA,NVDA raises full year guidance,fnspid
+2023-01-28,NVDA,NVDA raises full year guidance,fnspid
+2023-01-28,AMZN,AMZN shares fall on weak guidance,fnspid
+2023-01-27,MSFT,MSFT shares fall on weak guidance,fnspid
+2023-01-26,MSFT,MSFT announces share buyback programme,fnspid
+2023-01-26,JPM,JPM shares fall on weak guidance,fnspid
+2023-01-25,MSFT,MSFT misses revenue estimates by 8%,fnspid
+2023-01-24,GOOGL,GOOGL cuts dividend amid cash concerns,fnspid
+2023-01-24,AAPL,AAPL raises full year guidance,fnspid
+2023-01-20,META,META profit margins under pressure,fnspid
+2023-01-19,JPM,JPM CEO resigns amid restructuring,fnspid
+2023-01-15,AAPL,AAPL reports stronger than expected revenue,fnspid
+2023-01-13,MSFT,MSFT cuts dividend amid cash concerns,fnspid
+2023-01-12,MSFT,MSFT profit margins under pressure,fnspid
+2023-01-10,NVDA,NVDA faces antitrust investigation,fnspid
+2023-01-09,TSLA,TSLA profit margins under pressure,fnspid
+2023-01-09,AAPL,AAPL faces SEC investigation over accounting,fnspid
+2023-01-09,AAPL,AAPL shares fall on weak guidance,fnspid
+2023-01-07,AMZN,AMZN stock upgraded by Goldman Sachs,fnspid
+2023-01-06,META,META faces antitrust investigation,fnspid
+2023-01-05,JPM,JPM announces share buyback programme,fnspid
+2023-01-02,AAPL,AAPL faces antitrust investigation,fnspid
+2022-12-30,GOOGL,GOOGL CEO resigns amid restructuring,fnspid
+2022-12-27,AMZN,AMZN shares fall on weak guidance,fnspid
+2022-12-27,NVDA,NVDA CEO resigns amid restructuring,fnspid
+2022-12-19,MSFT,MSFT CEO resigns amid restructuring,fnspid
+2022-12-15,TSLA,TSLA cuts dividend amid cash concerns,fnspid
+2022-12-13,AMZN,AMZN misses revenue estimates by 8%,fnspid
+2022-12-13,JPM,JPM reports stronger than expected revenue,fnspid
+2022-12-12,TSLA,TSLA CEO resigns amid restructuring,fnspid
+2022-12-11,GOOGL,GOOGL announces share buyback programme,fnspid
+2022-12-08,GS,GS beats earnings expectations,fnspid
+2022-12-07,AAPL,AAPL raises full year guidance,fnspid
+2022-12-05,AAPL,AAPL stock upgraded by Goldman Sachs,fnspid
+2022-12-05,MSFT,MSFT profit margins under pressure,fnspid
+2022-12-03,AMZN,AMZN beats earnings expectations,fnspid
+2022-11-29,TSLA,TSLA stock upgraded by Goldman Sachs,fnspid
+2022-11-28,GS,GS faces SEC investigation over accounting,fnspid
+2022-11-28,AAPL,AAPL shares fall on weak guidance,fnspid
+2022-11-27,BAC,BAC reports stronger than expected revenue,fnspid
+2022-11-27,META,META faces SEC investigation over accounting,fnspid
+2022-11-26,META,META profit margins under pressure,fnspid
+2022-11-21,NVDA,NVDA beats earnings expectations,fnspid
+2022-11-20,JPM,JPM cuts dividend amid cash concerns,fnspid
+2022-11-18,NVDA,NVDA reports record quarterly earnings,fnspid
+2022-11-18,BAC,BAC CEO resigns amid restructuring,fnspid
+2022-11-18,AMZN,AMZN profit margins under pressure,fnspid
+2022-11-16,META,META reports record quarterly earnings,fnspid
+2022-11-16,AMZN,AMZN reports stronger than expected revenue,fnspid
+2022-11-14,AMZN,AMZN profit margins under pressure,fnspid
+2022-11-11,GS,GS faces antitrust investigation,fnspid
+2022-11-10,TSLA,TSLA faces SEC investigation over accounting,fnspid
+2022-11-09,TSLA,TSLA CEO resigns amid restructuring,fnspid
+2022-11-08,TSLA,TSLA reports stronger than expected revenue,fnspid
+2022-11-06,TSLA,TSLA stock upgraded by Goldman Sachs,fnspid
+2022-11-05,META,META shares fall on weak guidance,fnspid
+2022-11-04,MSFT,MSFT reports stronger than expected revenue,fnspid
+2022-11-03,GS,GS shares fall on weak guidance,fnspid
+2022-11-02,JPM,JPM reports stronger than expected revenue,fnspid
+2022-10-31,GOOGL,GOOGL announces share buyback programme,fnspid
+2022-10-30,JPM,JPM reports stronger than expected revenue,fnspid
+2022-10-30,GOOGL,GOOGL misses revenue estimates by 8%,fnspid
+2022-10-28,GS,GS misses revenue estimates by 8%,fnspid
+2022-10-26,GOOGL,GOOGL cuts dividend amid cash concerns,fnspid
+2022-10-24,AMZN,AMZN announces major cost cutting programme,fnspid
+2022-10-22,GOOGL,GOOGL faces antitrust investigation,fnspid
+2022-10-21,TSLA,TSLA stock upgraded by Goldman Sachs,fnspid
+2022-10-19,AMZN,AMZN CEO resigns amid restructuring,fnspid
+2022-10-17,NVDA,NVDA shares fall on weak guidance,fnspid
+2022-10-14,META,META beats earnings expectations,fnspid
+2022-10-13,BAC,BAC raises full year guidance,fnspid
+2022-10-12,MSFT,MSFT beats earnings expectations,fnspid
+2022-10-12,TSLA,TSLA faces antitrust investigation,fnspid
+2022-10-12,BAC,BAC CEO resigns amid restructuring,fnspid
+2022-10-12,TSLA,TSLA shares fall on weak guidance,fnspid
+2022-10-09,MSFT,MSFT reports record quarterly earnings,fnspid
+2022-10-08,NVDA,NVDA raises full year guidance,fnspid
+2022-10-07,TSLA,TSLA announces share buyback programme,fnspid
+2022-10-07,NVDA,NVDA reports stronger than expected revenue,fnspid
+2022-10-07,NVDA,NVDA completes acquisition of rival firm,fnspid
+2022-10-06,JPM,JPM announces share buyback programme,fnspid
+2022-10-06,NVDA,NVDA raises full year guidance,fnspid
+2022-10-04,NVDA,NVDA profit margins under pressure,fnspid
+2022-10-02,GS,GS beats earnings expectations,fnspid
+2022-10-01,AMZN,AMZN profit margins under pressure,fnspid
+2022-09-29,GOOGL,GOOGL shares fall on weak guidance,fnspid
+2022-09-29,NVDA,NVDA raises full year guidance,fnspid
+2022-09-29,AAPL,AAPL beats earnings expectations,fnspid
+2022-09-29,TSLA,TSLA raises full year guidance,fnspid
+2022-09-27,AAPL,AAPL reports stronger than expected revenue,fnspid
+2022-09-25,GS,GS faces antitrust investigation,fnspid
+2022-09-25,MSFT,MSFT faces antitrust investigation,fnspid
+2022-09-24,GOOGL,GOOGL reports record quarterly earnings,fnspid
+2022-09-23,TSLA,TSLA cuts dividend amid cash concerns,fnspid
+2022-09-22,GS,GS announces major cost cutting programme,fnspid
+2022-09-20,TSLA,TSLA reports stronger than expected revenue,fnspid
+2022-09-19,JPM,JPM cuts dividend amid cash concerns,fnspid
+2022-09-16,GOOGL,GOOGL reports record quarterly earnings,fnspid
+2022-09-15,TSLA,TSLA completes acquisition of rival firm,fnspid
+2022-09-14,BAC,BAC reports stronger than expected revenue,fnspid
+2022-09-13,AMZN,AMZN profit margins under pressure,fnspid
+2022-09-11,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2022-09-08,BAC,BAC raises full year guidance,fnspid
+2022-09-08,GOOGL,GOOGL completes acquisition of rival firm,fnspid
+2022-09-07,BAC,BAC reports stronger than expected revenue,fnspid
+2022-09-04,AMZN,AMZN reports record quarterly earnings,fnspid
+2022-09-04,TSLA,TSLA completes acquisition of rival firm,fnspid
+2022-09-04,META,META profit margins under pressure,fnspid
+2022-09-03,MSFT,MSFT raises full year guidance,fnspid
+2022-09-03,META,META announces major cost cutting programme,fnspid
+2022-09-02,TSLA,TSLA profit margins under pressure,fnspid
+2022-09-02,META,META raises full year guidance,fnspid
+2022-09-01,MSFT,MSFT completes acquisition of rival firm,fnspid
+2022-08-31,MSFT,MSFT faces antitrust investigation,fnspid
+2022-08-29,MSFT,MSFT misses revenue estimates by 8%,fnspid
+2022-08-28,MSFT,MSFT profit margins under pressure,fnspid
+2022-08-27,MSFT,MSFT stock upgraded by Goldman Sachs,fnspid
+2022-08-27,AMZN,AMZN stock upgraded by Goldman Sachs,fnspid
+2022-08-20,GOOGL,GOOGL announces major cost cutting programme,fnspid
+2022-08-18,AAPL,AAPL CEO resigns amid restructuring,fnspid
+2022-08-15,MSFT,MSFT faces SEC investigation over accounting,fnspid
+2022-08-14,NVDA,NVDA beats earnings expectations,fnspid
+2022-08-14,META,META faces antitrust investigation,fnspid
+2022-08-14,AMZN,AMZN shares fall on weak guidance,fnspid
+2022-08-13,BAC,BAC CEO resigns amid restructuring,fnspid
+2022-08-12,MSFT,MSFT shares fall on weak guidance,fnspid
+2022-08-10,GOOGL,GOOGL announces share buyback programme,fnspid
+2022-08-08,GOOGL,GOOGL reports stronger than expected revenue,fnspid
+2022-08-07,MSFT,MSFT completes acquisition of rival firm,fnspid
+2022-08-06,GOOGL,GOOGL cuts dividend amid cash concerns,fnspid
+2022-08-05,BAC,BAC CEO resigns amid restructuring,fnspid
+2022-08-04,JPM,JPM faces SEC investigation over accounting,fnspid
+2022-08-04,JPM,JPM shares fall on weak guidance,fnspid
+2022-08-01,MSFT,MSFT announces major cost cutting programme,fnspid
+2022-07-31,BAC,BAC reports record quarterly earnings,fnspid
+2022-07-24,TSLA,TSLA announces share buyback programme,fnspid
+2022-07-23,BAC,BAC reports stronger than expected revenue,fnspid
+2022-07-23,AMZN,AMZN announces major cost cutting programme,fnspid
+2022-07-23,NVDA,NVDA shares fall on weak guidance,fnspid
+2022-07-22,META,META profit margins under pressure,fnspid
+2022-07-18,MSFT,MSFT stock upgraded by Goldman Sachs,fnspid
+2022-07-14,AMZN,AMZN announces share buyback programme,fnspid
+2022-07-14,AMZN,AMZN profit margins under pressure,fnspid
+2022-07-13,GS,GS stock upgraded by Goldman Sachs,fnspid
+2022-07-10,MSFT,MSFT stock upgraded by Goldman Sachs,fnspid
+2022-07-02,NVDA,NVDA announces major cost cutting programme,fnspid
+2022-06-30,BAC,BAC announces share buyback programme,fnspid
+2022-06-30,GOOGL,GOOGL beats earnings expectations,fnspid
+2022-06-29,GOOGL,GOOGL raises full year guidance,fnspid
+2022-06-28,BAC,BAC profit margins under pressure,fnspid
+2022-06-20,MSFT,MSFT cuts dividend amid cash concerns,fnspid
+2022-06-19,BAC,BAC reports stronger than expected revenue,fnspid
+2022-06-19,MSFT,MSFT reports record quarterly earnings,fnspid
+2022-06-16,AMZN,AMZN stock upgraded by Goldman Sachs,fnspid
+2022-06-15,GOOGL,GOOGL CEO resigns amid restructuring,fnspid
+2022-06-13,AMZN,AMZN faces SEC investigation over accounting,fnspid
+2022-06-13,AAPL,AAPL announces major cost cutting programme,fnspid
+2022-06-12,TSLA,TSLA faces antitrust investigation,fnspid
+2022-06-08,BAC,BAC shares fall on weak guidance,fnspid
+2022-06-04,MSFT,MSFT raises full year guidance,fnspid
+2022-06-02,AAPL,AAPL raises full year guidance,fnspid
+2022-06-02,AMZN,AMZN profit margins under pressure,fnspid
+2022-06-02,TSLA,TSLA stock upgraded by Goldman Sachs,fnspid
+2022-06-01,GS,GS announces major cost cutting programme,fnspid
+2022-05-28,TSLA,TSLA reports record quarterly earnings,fnspid
+2022-05-26,JPM,JPM stock upgraded by Goldman Sachs,fnspid
+2022-05-24,NVDA,NVDA cuts dividend amid cash concerns,fnspid
+2022-05-23,AMZN,AMZN announces share buyback programme,fnspid
+2022-05-20,NVDA,NVDA reports stronger than expected revenue,fnspid
+2022-05-18,MSFT,MSFT faces antitrust investigation,fnspid
+2022-05-16,GOOGL,GOOGL announces share buyback programme,fnspid
+2022-05-16,AMZN,AMZN completes acquisition of rival firm,fnspid
+2022-05-16,NVDA,NVDA faces SEC investigation over accounting,fnspid
+2022-05-14,GS,GS announces major cost cutting programme,fnspid
+2022-05-11,TSLA,TSLA faces antitrust investigation,fnspid
+2022-05-11,JPM,JPM completes acquisition of rival firm,fnspid
+2022-05-11,GOOGL,GOOGL beats earnings expectations,fnspid
+2022-05-10,JPM,JPM reports stronger than expected revenue,fnspid
+2022-05-09,NVDA,NVDA announces major cost cutting programme,fnspid
+2022-05-09,GS,GS announces share buyback programme,fnspid
+2022-05-08,TSLA,TSLA completes acquisition of rival firm,fnspid
+2022-05-08,JPM,JPM cuts dividend amid cash concerns,fnspid
+2022-05-06,JPM,JPM announces share buyback programme,fnspid
+2022-05-05,NVDA,NVDA announces share buyback programme,fnspid
+2022-05-04,JPM,JPM announces share buyback programme,fnspid
+2022-05-04,META,META announces major cost cutting programme,fnspid
+2022-05-03,AMZN,AMZN CEO resigns amid restructuring,fnspid
+2022-05-03,AMZN,AMZN beats earnings expectations,fnspid
+2022-04-28,META,META reports stronger than expected revenue,fnspid
+2022-04-27,MSFT,MSFT announces share buyback programme,fnspid
+2022-04-25,NVDA,NVDA reports record quarterly earnings,fnspid
+2022-04-25,TSLA,TSLA reports record quarterly earnings,fnspid
+2022-04-22,GS,GS announces major cost cutting programme,fnspid
+2022-04-21,GOOGL,GOOGL faces SEC investigation over accounting,fnspid
+2022-04-20,AAPL,AAPL faces antitrust investigation,fnspid
+2022-04-20,JPM,JPM misses revenue estimates by 8%,fnspid
+2022-04-19,NVDA,NVDA faces antitrust investigation,fnspid
+2022-04-18,GS,GS profit margins under pressure,fnspid
+2022-04-13,GS,GS stock upgraded by Goldman Sachs,fnspid
+2022-04-13,META,META shares fall on weak guidance,fnspid
+2022-04-10,GOOGL,GOOGL profit margins under pressure,fnspid
+2022-04-07,BAC,BAC announces share buyback programme,fnspid
+2022-04-06,AAPL,AAPL reports record quarterly earnings,fnspid
+2022-04-06,META,META CEO resigns amid restructuring,fnspid
+2022-04-03,JPM,JPM announces share buyback programme,fnspid
+2022-04-01,AAPL,AAPL cuts dividend amid cash concerns,fnspid
+2022-03-30,AMZN,AMZN stock upgraded by Goldman Sachs,fnspid
+2022-03-29,META,META misses revenue estimates by 8%,fnspid
+2022-03-29,META,META faces SEC investigation over accounting,fnspid
+2022-03-29,NVDA,NVDA announces share buyback programme,fnspid
+2022-03-28,GOOGL,GOOGL profit margins under pressure,fnspid
+2022-03-25,JPM,JPM stock upgraded by Goldman Sachs,fnspid
+2022-03-24,BAC,BAC profit margins under pressure,fnspid
+2022-03-21,JPM,JPM cuts dividend amid cash concerns,fnspid
+2022-03-19,MSFT,MSFT cuts dividend amid cash concerns,fnspid
+2022-03-19,TSLA,TSLA announces share buyback programme,fnspid
+2022-03-18,GOOGL,GOOGL completes acquisition of rival firm,fnspid
+2022-03-17,BAC,BAC cuts dividend amid cash concerns,fnspid
+2022-03-13,JPM,JPM stock upgraded by Goldman Sachs,fnspid
+2022-03-12,GS,GS faces antitrust investigation,fnspid
+2022-03-12,AAPL,AAPL shares fall on weak guidance,fnspid
+2022-03-12,TSLA,TSLA stock upgraded by Goldman Sachs,fnspid
+2022-03-12,META,META announces share buyback programme,fnspid
+2022-03-11,MSFT,MSFT shares fall on weak guidance,fnspid
+2022-03-11,AAPL,AAPL announces share buyback programme,fnspid
+2022-03-08,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2022-03-07,BAC,BAC shares fall on weak guidance,fnspid
+2022-03-06,AMZN,AMZN profit margins under pressure,fnspid
+2022-02-27,AAPL,AAPL CEO resigns amid restructuring,fnspid
+2022-02-27,GS,GS stock upgraded by Goldman Sachs,fnspid
+2022-02-25,TSLA,TSLA stock upgraded by Goldman Sachs,fnspid
+2022-02-22,TSLA,TSLA announces major cost cutting programme,fnspid
+2022-02-22,JPM,JPM faces antitrust investigation,fnspid
+2022-02-21,NVDA,NVDA cuts dividend amid cash concerns,fnspid
+2022-02-21,META,META reports record quarterly earnings,fnspid
+2022-02-18,MSFT,MSFT announces major cost cutting programme,fnspid
+2022-02-17,GOOGL,GOOGL reports record quarterly earnings,fnspid
+2022-02-16,MSFT,MSFT raises full year guidance,fnspid
+2022-02-15,AMZN,AMZN faces SEC investigation over accounting,fnspid
+2022-02-14,META,META faces SEC investigation over accounting,fnspid
+2022-02-12,META,META announces major cost cutting programme,fnspid
+2022-02-11,JPM,JPM shares fall on weak guidance,fnspid
+2022-02-10,MSFT,MSFT shares fall on weak guidance,fnspid
+2022-02-09,MSFT,MSFT beats earnings expectations,fnspid
+2022-02-07,GOOGL,GOOGL cuts dividend amid cash concerns,fnspid
+2022-02-06,GOOGL,GOOGL completes acquisition of rival firm,fnspid
+2022-02-03,TSLA,TSLA faces SEC investigation over accounting,fnspid
+2022-02-02,AMZN,AMZN stock upgraded by Goldman Sachs,fnspid
+2022-02-01,AAPL,AAPL announces major cost cutting programme,fnspid
+2022-01-30,BAC,BAC CEO resigns amid restructuring,fnspid
+2022-01-30,JPM,JPM faces antitrust investigation,fnspid
+2022-01-30,BAC,BAC cuts dividend amid cash concerns,fnspid
+2022-01-30,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2022-01-29,NVDA,NVDA CEO resigns amid restructuring,fnspid
+2022-01-28,META,META completes acquisition of rival firm,fnspid
+2022-01-27,META,META faces SEC investigation over accounting,fnspid
+2022-01-26,AMZN,AMZN cuts dividend amid cash concerns,fnspid
+2022-01-25,AMZN,AMZN announces share buyback programme,fnspid
+2022-01-22,META,META shares fall on weak guidance,fnspid
+2022-01-21,AMZN,AMZN announces share buyback programme,fnspid
+2022-01-18,TSLA,TSLA cuts dividend amid cash concerns,fnspid
+2022-01-16,NVDA,NVDA stock upgraded by Goldman Sachs,fnspid
+2022-01-15,GOOGL,GOOGL faces SEC investigation over accounting,fnspid
+2022-01-13,TSLA,TSLA misses revenue estimates by 8%,fnspid
+2022-01-12,NVDA,NVDA stock upgraded by Goldman Sachs,fnspid
+2022-01-11,JPM,JPM completes acquisition of rival firm,fnspid
+2022-01-09,BAC,BAC faces SEC investigation over accounting,fnspid
+2022-01-07,BAC,BAC cuts dividend amid cash concerns,fnspid
+2022-01-04,JPM,JPM reports record quarterly earnings,fnspid
+2022-01-03,JPM,JPM stock upgraded by Goldman Sachs,fnspid
+2022-01-02,NVDA,NVDA stock upgraded by Goldman Sachs,fnspid
+2022-01-01,BAC,BAC completes acquisition of rival firm,fnspid
