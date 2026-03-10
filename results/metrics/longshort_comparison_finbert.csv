@@ -1,0 +1,5 @@
+strategy,model_name,total_return,benchmark_total_return,annualised_return,annualised_volatility,sharpe_ratio,sortino_ratio,calmar_ratio,max_drawdown,win_rate,alpha,beta,total_trades,n_days,ann_turnover,avg_holding_period_days,total_cost_drag,ic,ic_p_value,hit_rate,n_periods,rebalance_periods,hold_days,quantile_cutoff
+A: Baseline,baseline,-0.0366,-0.1456,-0.0167,0.2616,-0.1065,-0.2536,-0.0478,-0.3498,0.4884,-0.0733,-0.0609,346.0,557.0,174.64,0.8,0.519,,,,,,,
+B: L/S 1d,,-0.2578,,-0.9444,0.4851,-5.7753,-2.4637,-3.3985,-0.2779,0.2692,,,,,,,,-0.147,0.2983,0.3269,26.0,584.0,1.0,0.2
+C: L/S 2d,,0.0217,,0.1838,0.2904,0.5616,1.0384,1.659,-0.1108,0.4375,,,,,,,,0.0063,0.9728,0.5625,16.0,369.0,2.0,0.2
+D: L/S 3d,,-0.0643,,-0.428,0.2197,-2.6407,-3.9549,-4.0442,-0.1058,0.3,,,,,,,,-0.1889,0.425,0.5,10.0,280.0,3.0,0.2

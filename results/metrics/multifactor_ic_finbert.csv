@@ -1,0 +1,5 @@
+factor,ic,p_value,significant,n
+signal,0.0954,0.0277,True,532
+momentum,0.0371,0.3935,False,531
+vol_factor,-0.0063,0.8855,False,531
+liquidity,0.0329,0.4497,False,531

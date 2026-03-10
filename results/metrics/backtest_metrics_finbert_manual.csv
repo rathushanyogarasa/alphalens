@@ -1,0 +1,2 @@
+model_name,total_return,benchmark_total_return,annualised_return,annualised_volatility,sharpe_ratio,sortino_ratio,calmar_ratio,max_drawdown,win_rate,alpha,beta,total_trades,n_days,ann_turnover,avg_holding_period_days,total_cost_drag
+finbert_manual,-0.0398,-0.126,-0.0182,0.2615,-0.1124,-0.26,-0.0525,-0.3462,0.4914,-0.0734,-0.0596,350,557,178.71,0.8,0.525

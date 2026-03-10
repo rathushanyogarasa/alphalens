@@ -1,0 +1,11 @@
+ticker,ic,p_value,significant,n
+NVDA,0.2285,0.0845,False,58
+TSLA,0.1599,0.186,False,70
+AAPL,0.146,0.3274,False,47
+GS,0.0449,0.7518,False,52
+GOOGL,0.0211,0.8776,False,56
+MSFT,0.0007,0.9952,False,69
+JPM,-0.006,0.9639,False,59
+AMZN,-0.0064,0.9595,False,66
+META,-0.1146,0.3753,False,62
+BAC,-0.2399,0.0649,False,60

@@ -20,6 +20,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import config
 from src.model import SIGNAL_MAP
+from src.financial_lexicon import score_headline as _lex_score_headline, get_top_signals
 
 # ---------------------------------------------------------------------------
 # Module-level logger
@@ -86,6 +87,37 @@ class RecommendationResult:
     source_breakdown: dict[str, int] = field(default_factory=dict)
     reasoning: str = ""
     generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    lexicon_score: float = 0.0
+    lexicon_bullish_phrases: list[str] = field(default_factory=list)
+    lexicon_bearish_phrases: list[str] = field(default_factory=list)
+
+    # --- Institutional-grade extended fields ---
+    macro_regime: str = ""
+    """Macroeconomic regime label (e.g. 'tightening', 'risk_off')."""
+
+    model_quality_score: float = 0.0
+    """Overall model quality score in [0, 10] from :mod:`~src.model_trust`."""
+
+    drivers: list[str] = field(default_factory=list)
+    """Key positive drivers behind the recommendation."""
+
+    risk_flags: list[str] = field(default_factory=list)
+    """Material risk factors that could counter the recommendation."""
+
+    adjusted_signal_score: float = 0.0
+    """Signal score after macro/commodity context adjustment."""
+
+    tactical_signal: str = "HOLD"
+    """Short-horizon signal (1–3 days): BUY / HOLD / SELL based on
+    raw sentiment strength alone (macro-unfiltered)."""
+
+    investment_view: str = "NEUTRAL"
+    """Medium-horizon view (1–4 weeks): POSITIVE / NEUTRAL / NEGATIVE
+    based on macro regime, sector exposure, and transmission-chain context."""
+
+    conviction_level: str = "LOW"
+    """Overall conviction: HIGH / MEDIUM / LOW based on multi-component
+    agreement (sentiment + keyword + macro + source quality)."""
 
     def __str__(self) -> str:  # pragma: no cover
         return (
@@ -130,10 +162,13 @@ class StockRecommendationEngine:
     def _load_keyword_weights(self) -> dict[str, float]:
         """Load keyword CAR weights from ``keyword_summary.csv``.
 
-        Reads ``config.METRICS_DIR / "keyword_summary.csv"`` and builds a
-        mapping of ``keyword → avg_CAR``.  If the file does not exist,
-        returns an empty dict (uniform weights of 1.0 are applied at
-        scoring time).
+        Applies quality filters before loading:
+
+        * Only keywords with ``signal_grade`` in
+          ``config.KEYWORD_GRADE_FILTER`` and above are loaded (A and B).
+        * Keywords with ``|avg_CAR|`` below
+          ``config.MIN_KEYWORD_CAR_MAGNITUDE`` are excluded.
+        * Company name tokens are never loaded as trading signals.
 
         Returns:
             dict[str, float]: Mapping of keyword string to its historical
@@ -147,8 +182,23 @@ class StockRecommendationEngine:
             return {}
         try:
             df = pd.read_csv(path)
+
+            # Grade filter (A and B only by default)
+            grade_floor = getattr(config, "KEYWORD_GRADE_FILTER", "B")
+            grade_order = {"A": 0, "B": 1, "C": 2}
+            floor_rank = grade_order.get(grade_floor, 1)
+            if "signal_grade" in df.columns:
+                df = df[df["signal_grade"].map(lambda g: grade_order.get(g, 2)) <= floor_rank]
+
+            # CAR magnitude filter
+            min_car = getattr(config, "MIN_KEYWORD_CAR_MAGNITUDE", 0.003)
+            df = df[df["avg_CAR"].abs() >= min_car]
+
             weights = dict(zip(df["keyword"].astype(str), df["avg_CAR"].astype(float)))
-            logger.info("Loaded %d keyword CAR weights from %s", len(weights), path)
+            logger.info(
+                "Loaded %d keyword CAR weights from %s (grade≥%s, |CAR|≥%.4f)",
+                len(weights), path, grade_floor, min_car,
+            )
             return weights
         except Exception as exc:
             logger.warning("Failed to load keyword weights: %s — using uniform", exc)
@@ -359,13 +409,23 @@ class StockRecommendationEngine:
         df = df.dropna(subset=["date"])
         df = df.drop_duplicates(subset=["headline"])
         df = df[df["headline"].str.strip() != ""]
+
+        # Near-duplicate suppression: keep only the highest-credibility source
+        # for headlines sharing the same first 60 characters (syndication dedup)
+        if len(df) > 1:
+            df["_head60"] = df["headline"].str.lower().str[:60]
+            df["_src_w"] = df["source"].map(lambda s: config.SOURCE_WEIGHTS.get(s, 0.5))
+            df = (
+                df.sort_values("_src_w", ascending=False)
+                .drop_duplicates(subset=["_head60"], keep="first")
+                .drop(columns=["_head60", "_src_w"])
+            )
+
         df = df.sort_values("date", ascending=False).reset_index(drop=True)
+        after_dedup = len(df)
         logger.info(
-            "[%s] Headlines fetched: %d (after dedup/clean: %d) | sources: %s",
-            ticker,
-            before,
-            len(df),
-            df["source"].value_counts().to_dict(),
+            "[%s] Headlines fetched: %d → %d (after dedup/syndication) | sources: %s",
+            ticker, before, after_dedup, df["source"].value_counts().to_dict(),
         )
         return df
 
@@ -416,19 +476,18 @@ class StockRecommendationEngine:
                 continue  # neutral contributes no directional signal
 
             row = news_df.iloc[i]
+            headline_text = str(row.get("headline", ""))
 
             # Weight 1: source credibility
             source = str(row.get("source", ""))
             source_w = config.SOURCE_WEIGHTS.get(source, 0.5)
 
-            # Weight 2: keyword impact
-            headline = str(row.get("headline", "")).lower()
+            # Weight 2: keyword CAR impact
             keyword_w = 1.0
             best_abs = 0.0
             for kw, avg_car in self.keyword_weights.items():
-                if kw.lower() in headline and abs(avg_car) > best_abs:
+                if kw.lower() in headline_text.lower() and abs(avg_car) > best_abs:
                     best_abs = abs(avg_car)
-                    # Scale: CAR of 0.02 → weight of 1 + 0.02*10 = 1.2 (capped at 2.0)
                     keyword_w = min(2.0, 1.0 + abs(avg_car) * 10)
 
             # Weight 3: recency decay
@@ -440,7 +499,23 @@ class StockRecommendationEngine:
             import math
             recency_w = math.exp(-config.RECENCY_DECAY_LAMBDA * days_old)
 
-            combined_w = source_w * keyword_w * recency_w
+            # Weight 4: financial lexicon agreement
+            # Amplifies when lexicon agrees with ML model, dampens when it disagrees
+            try:
+                lex = _lex_score_headline(headline_text)
+                lex_signal = lex["normalised_score"]  # [-1, 1]
+                if lex_signal * sentiment > 0:
+                    # Agreement: boost up to 1.5× based on lexicon confidence
+                    lexicon_w = 1.0 + 0.5 * abs(lex_signal)
+                elif lex_signal * sentiment < 0:
+                    # Disagreement: dampen down to 0.3×
+                    lexicon_w = max(0.3, 1.0 - 0.7 * abs(lex_signal))
+                else:
+                    lexicon_w = 1.0  # lexicon neutral — no adjustment
+            except Exception:
+                lexicon_w = 1.0
+
+            combined_w = source_w * keyword_w * recency_w * lexicon_w
             weighted_scores.append(sentiment * combined_w * pred["confidence"])
             weights.append(combined_w)
 
@@ -451,6 +526,47 @@ class StockRecommendationEngine:
         return round(float(score), 6)
 
     # ------------------------------------------------------------------
+    # Lexicon analysis
+    # ------------------------------------------------------------------
+
+    def _run_lexicon_analysis(self, headlines: list[str]) -> dict:
+        """Score all headlines with the financial lexicon and aggregate results.
+
+        Args:
+            headlines: Raw headline strings to analyse.
+
+        Returns:
+            dict: Keys ``avg_score``, ``bullish_phrases``, ``bearish_phrases``,
+            ``bullish_count``, ``bearish_count``.
+        """
+        if not headlines:
+            return {
+                "avg_score": 0.0,
+                "bullish_phrases": [],
+                "bearish_phrases": [],
+                "bullish_count": 0,
+                "bearish_count": 0,
+            }
+        try:
+            signals = get_top_signals(headlines, n=5)
+            return {
+                "avg_score": round(signals.get("avg_score", 0.0), 4),
+                "bullish_phrases": [p for p, _ in signals.get("top_bullish_phrases", [])],
+                "bearish_phrases": [p for p, _ in signals.get("top_bearish_phrases", [])],
+                "bullish_count": signals.get("bullish_count", 0),
+                "bearish_count": signals.get("bearish_count", 0),
+            }
+        except Exception as exc:
+            logger.warning("Lexicon analysis failed: %s", exc)
+            return {
+                "avg_score": 0.0,
+                "bullish_phrases": [],
+                "bearish_phrases": [],
+                "bullish_count": 0,
+                "bearish_count": 0,
+            }
+
+    # ------------------------------------------------------------------
     # Reasoning generation
     # ------------------------------------------------------------------
 
@@ -459,6 +575,7 @@ class StockRecommendationEngine:
         predictions: list[dict],
         news_df: pd.DataFrame,
         signal_score: float,
+        lexicon: dict | None = None,
     ) -> str:
         """Build a plain-English explanation of the recommendation.
 
@@ -536,7 +653,25 @@ class StockRecommendationEngine:
                 f"countering {n_pos} positive one(s)."
             )
 
-        # Clause 5: composite score
+        # Clause 5: lexicon findings
+        if lexicon:
+            bullish_p = lexicon.get("bullish_phrases", [])
+            bearish_p = lexicon.get("bearish_phrases", [])
+            lex_score = lexicon.get("avg_score", 0.0)
+            if bullish_p:
+                parts.append(
+                    f"Lexicon detected bullish signals: {', '.join(bullish_p[:3])} "
+                    f"(lexicon score: {lex_score:+.2f})."
+                )
+            if bearish_p:
+                parts.append(
+                    f"Lexicon detected bearish signals: {', '.join(bearish_p[:3])} "
+                    f"(lexicon score: {lex_score:+.2f})."
+                )
+            if bullish_p and bearish_p:
+                parts.append("Mixed lexicon signals — both bullish and bearish phrases present.")
+
+        # Clause 6: composite score
         parts.append(f"Composite signal score: {signal_score:+.3f}.")
 
         return " ".join(parts)
@@ -549,7 +684,8 @@ class StockRecommendationEngine:
         """Generate a buy/hold/sell recommendation for *ticker*.
 
         Orchestrates headline fetching, sentiment prediction, signal
-        scoring, keyword extraction, and reasoning generation.
+        scoring, macro/commodity context enrichment, keyword extraction,
+        and reasoning generation.
 
         Args:
             ticker: Equity ticker symbol (e.g. ``"AAPL"``).
@@ -592,30 +728,210 @@ class StockRecommendationEngine:
             else 0.0
         )
 
-        # Signal score
+        # Signal score (ML model + lexicon-weighted)
         signal_score = self._calculate_signal_score(predictions, news_df)
 
-        # Recommendation
+        # Lexicon analysis — run across all headlines (not just confident ones)
+        lexicon = self._run_lexicon_analysis(texts)
+
+        # ----------------------------------------------------------------
+        # Macro / commodity context enrichment
+        # ----------------------------------------------------------------
+        macro_regime = ""
+        adjusted_score = signal_score
+        drivers: list[str] = []
+        risk_flags: list[str] = []
+        model_quality_score = 0.0
+
+        if not config.QUICK_TEST:
+            try:
+                from src.macro_data import MacroDataCollector
+                from src.commodity_data import CommodityDataCollector
+                from src.transmission_chain import TransmissionChainAnalyser
+                from src.enhanced_model import adjust_signal_with_context
+                from src.model_trust import run_trust_scoring
+
+                macro = MacroDataCollector().get_macro_snapshot()
+                commodities = CommodityDataCollector().get_commodity_snapshot()
+                analyser = TransmissionChainAnalyser()
+
+                # Adjust signal with macro/commodity context
+                adjusted_score, adjustment_reasons = adjust_signal_with_context(
+                    signal_score=signal_score,
+                    ticker=ticker,
+                    macro=macro,
+                    commodities=commodities,
+                    analyser=analyser,
+                )
+
+                macro_regime = macro.regime.value
+
+                # Transmission chain events → drivers and risk flags
+                events = analyser.analyse(macro, commodities)
+                risk_flags = analyser.get_risk_flags(ticker, events)
+
+                # Drivers from sentiment + adjustments
+                n_pos = sum(1 for p in confident_preds if p.get("label_name") == "positive")
+                n_neg = sum(1 for p in confident_preds if p.get("label_name") == "negative")
+                if n_pos > n_neg:
+                    drivers.append(f"Positive news sentiment ({n_pos}/{confident_headline_count} confident headlines)")
+                if lexicon.get("avg_score", 0.0) > 0.1:
+                    bullish_p = lexicon.get("bullish_phrases", [])
+                    if bullish_p:
+                        drivers.append(f"Bullish lexicon signals: {', '.join(bullish_p[:2])}")
+                for reason in adjustment_reasons[:2]:
+                    drivers.append(reason)
+
+                # Model quality score
+                try:
+                    report = run_trust_scoring()
+                    model_quality_score = report.overall_score
+                except Exception as exc:
+                    logger.debug("Trust scoring failed: %s", exc)
+
+            except Exception as exc:
+                logger.warning("[%s] Macro/commodity enrichment failed: %s", ticker, exc)
+
+        # ----------------------------------------------------------------
+        # Tactical signal (raw sentiment, 1–3 day horizon)
+        # ----------------------------------------------------------------
         if signal_score > _BUY_THRESHOLD:
-            recommendation = "BUY"
+            tactical_signal = "BUY"
         elif signal_score < _SELL_THRESHOLD:
+            tactical_signal = "SELL"
+        else:
+            tactical_signal = "HOLD"
+
+        # ----------------------------------------------------------------
+        # Investment view (macro-informed, 1–4 week horizon)
+        # ----------------------------------------------------------------
+        _hostile_regimes = {"risk_off", "growth_slowdown", "tightening", "inflation_shock"}
+        _friendly_regimes = {"risk_on", "easing"}
+        if macro_regime in _friendly_regimes and adjusted_score > 0.1:
+            investment_view = "POSITIVE"
+        elif macro_regime in _hostile_regimes or adjusted_score < -0.1:
+            investment_view = "NEGATIVE"
+        else:
+            investment_view = "NEUTRAL"
+
+        # ----------------------------------------------------------------
+        # Multi-component conviction scoring
+        # ----------------------------------------------------------------
+        conviction_points = 0
+
+        # 1. Enough confident headlines
+        min_headlines = getattr(config, "MIN_CONFIDENT_HEADLINES", 3)
+        if confident_headline_count >= min_headlines:
+            conviction_points += 1
+
+        # 2. Strong raw signal magnitude
+        if abs(signal_score) >= 0.55:
+            conviction_points += 1
+        elif abs(signal_score) >= 0.45:
+            conviction_points += 0
+
+        # 3. Source quality gate
+        min_sq = getattr(config, "MIN_SOURCE_QUALITY", 0.65)
+        if confident_headline_count > 0:
+            source_weights_for_conf = [
+                config.SOURCE_WEIGHTS.get(str(news_df.iloc[i].get("source", "")), 0.5)
+                for i, p in enumerate(predictions)
+                if p["confidence"] >= config.CONFIDENCE_THRESHOLD
+                and i < len(news_df)
+            ]
+            avg_src_quality = sum(source_weights_for_conf) / len(source_weights_for_conf) if source_weights_for_conf else 0.0
+            if avg_src_quality >= min_sq:
+                conviction_points += 1
+
+        # 4. Lexicon agreement
+        lex_score = lexicon.get("avg_score", 0.0)
+        if lex_score * signal_score > 0 and abs(lex_score) > 0.15:
+            conviction_points += 1
+
+        # 5. Macro alignment
+        if macro_regime and getattr(config, "REQUIRE_MACRO_ALIGNMENT", True):
+            if investment_view == "POSITIVE" and tactical_signal == "BUY":
+                conviction_points += 1
+            elif investment_view == "NEGATIVE" and tactical_signal == "SELL":
+                conviction_points += 1
+
+        if conviction_points >= 4:
+            conviction_level = "HIGH"
+        elif conviction_points >= 2:
+            conviction_level = "MEDIUM"
+        else:
+            conviction_level = "LOW"
+
+        # ----------------------------------------------------------------
+        # Final recommendation with conviction and regime gates
+        # ----------------------------------------------------------------
+        effective_score = adjusted_score if adjusted_score != 0.0 else signal_score
+
+        # Base recommendation from adjusted score
+        if effective_score > _BUY_THRESHOLD:
+            recommendation = "BUY"
+        elif effective_score < _SELL_THRESHOLD:
             recommendation = "SELL"
         else:
             recommendation = "HOLD"
 
-        # Keyword extraction: positive and negative
-        top_positive_keywords = self._extract_sentiment_keywords(
-            predictions, news_df, target_label="positive", top_n=5
+        # Gate 1: Model quality floor
+        min_quality = getattr(config, "MIN_MODEL_QUALITY_FOR_TRADE", 5.5)
+        if model_quality_score > 0 and model_quality_score < min_quality:
+            if recommendation != "HOLD":
+                logger.info(
+                    "[%s] Downgraded %s → HOLD (model quality %.1f < %.1f floor)",
+                    ticker, recommendation, model_quality_score, min_quality,
+                )
+                recommendation = "HOLD"
+                if "Model quality below trade threshold" not in risk_flags:
+                    risk_flags.append(f"Model quality ({model_quality_score:.1f}) below trade floor ({min_quality:.1f})")
+
+        # Gate 2: Minimum confident headlines
+        if confident_headline_count < min_headlines and recommendation != "HOLD":
+            logger.info(
+                "[%s] Downgraded %s → HOLD (only %d/%d confident headlines)",
+                ticker, recommendation, confident_headline_count, min_headlines,
+            )
+            recommendation = "HOLD"
+            risk_flags.append(f"Insufficient confident headlines ({confident_headline_count} < {min_headlines})")
+
+        # Gate 3: Regime-based suppression
+        if getattr(config, "REQUIRE_MACRO_ALIGNMENT", True) and macro_regime:
+            hostile = macro_regime in _hostile_regimes
+            if hostile and recommendation == "BUY" and conviction_level == "LOW":
+                logger.info(
+                    "[%s] BUY downgraded → HOLD (hostile regime=%s, conviction=LOW)",
+                    ticker, macro_regime,
+                )
+                recommendation = "HOLD"
+                risk_flags.append(f"Macro regime ({macro_regime.replace('_', ' ')}) hostile — BUY suppressed")
+
+        # Gate 4: Risk flag overrides adjusted-score disagreement
+        if risk_flags and len(risk_flags) >= 2 and adjusted_score < signal_score * 0.5 and recommendation == "BUY":
+            logger.info("[%s] BUY downgraded → HOLD (multiple risk flags + adj score retreated)", ticker)
+            recommendation = "HOLD"
+
+        # Gate 5: Low conviction forces HOLD for directional calls
+        if conviction_level == "LOW" and recommendation != "HOLD":
+            logger.info("[%s] %s downgraded → HOLD (conviction=LOW)", ticker, recommendation)
+            recommendation = "HOLD"
+            risk_flags.append("Signal conviction too low — holding instead of trading")
+
+        # ----------------------------------------------------------------
+        # Keyword extraction
+        # ----------------------------------------------------------------
+        top_positive_keywords = (
+            lexicon.get("bullish_phrases", [])
+            or self._extract_sentiment_keywords(predictions, news_df, target_label="positive", top_n=5)
         )
-        top_negative_keywords = self._extract_sentiment_keywords(
-            predictions, news_df, target_label="negative", top_n=5
+        top_negative_keywords = (
+            lexicon.get("bearish_phrases", [])
+            or self._extract_sentiment_keywords(predictions, news_df, target_label="negative", top_n=5)
         )
 
-        # Source breakdown
         source_breakdown = news_df["source"].value_counts().to_dict()
-
-        # Reasoning
-        reasoning = self._generate_reasoning(predictions, news_df, signal_score)
+        reasoning = self._generate_reasoning(predictions, news_df, signal_score, lexicon=lexicon)
 
         result = RecommendationResult(
             ticker=ticker,
@@ -624,22 +940,30 @@ class StockRecommendationEngine:
             signal_score=round(signal_score, 4),
             headline_count=headline_count,
             confident_headline_count=confident_headline_count,
-            top_positive_keywords=top_positive_keywords,
-            top_negative_keywords=top_negative_keywords,
+            top_positive_keywords=top_positive_keywords[:5],
+            top_negative_keywords=top_negative_keywords[:5],
             source_breakdown=source_breakdown,
             reasoning=reasoning,
             generated_at=datetime.now(timezone.utc),
+            lexicon_score=round(lexicon.get("avg_score", 0.0), 4),
+            lexicon_bullish_phrases=lexicon.get("bullish_phrases", []),
+            lexicon_bearish_phrases=lexicon.get("bearish_phrases", []),
+            macro_regime=macro_regime,
+            model_quality_score=round(model_quality_score, 2),
+            drivers=drivers,
+            risk_flags=risk_flags,
+            adjusted_signal_score=round(adjusted_score, 4),
+            tactical_signal=tactical_signal,
+            investment_view=investment_view,
+            conviction_level=conviction_level,
         )
 
         logger.info(
-            "[%s] → %s | score=%+.3f | conf=%.2f | "
-            "headlines=%d (confident=%d)",
-            ticker,
-            recommendation,
-            signal_score,
-            mean_confidence,
-            headline_count,
-            confident_headline_count,
+            "[%s] → %s (tactical=%s inv_view=%s conviction=%s) | "
+            "score=%+.3f adj=%+.3f | conf=%.2f | headlines=%d/%d | regime=%s | quality=%.1f",
+            ticker, recommendation, tactical_signal, investment_view, conviction_level,
+            signal_score, adjusted_score, mean_confidence,
+            confident_headline_count, headline_count, macro_regime or "N/A", model_quality_score,
         )
         return result
 

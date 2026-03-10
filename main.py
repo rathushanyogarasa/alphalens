@@ -43,7 +43,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--stages",
         type=str,
-        default="data,sources,train,evaluate,backtest,keywords,recommend",
+        default="data,sources,train,evaluate,backtest,keywords,macro,commodities,trust,recommend",
         help="Comma-separated stages to run",
     )
     parser.add_argument("--recommend", type=str, default="", help="Ticker to recommend")
@@ -119,6 +119,9 @@ def main() -> None:
     eval_metrics = None
     bt_finbert = None
     keyword_results = None
+    macro_snapshot = None
+    commodity_snapshot = None
+    trust_report = None
 
     def _run_stage(name: str, fn):
         t0 = time.time()
@@ -209,6 +212,30 @@ def main() -> None:
         prices = _run_stage("Price Fetch", lambda: fetch_price_data(config.TICKERS, start, end))
         keyword_results = _run_stage("Keyword Analysis", lambda: run_keyword_analysis(news_df, prices))
 
+    if "macro" in stages:
+        from src.macro_data import run_macro_data
+
+        macro_snapshot = _run_stage("Macro Data", run_macro_data)
+
+    if "commodities" in stages:
+        from src.commodity_data import run_commodity_data
+
+        commodity_snapshot = _run_stage("Commodity Data", run_commodity_data)
+
+    if "trust" in stages:
+        from src.model_trust import run_trust_scoring
+
+        trust_report = _run_stage(
+            "Model Trust Scoring",
+            lambda: run_trust_scoring(
+                eval_metrics=eval_metrics,
+                backtest_metrics=bt_finbert,
+            ),
+        )
+        if trust_report:
+            logger.info("Model Quality Score: %.1f / 10  [%s]",
+                        trust_report.overall_score, trust_report.verdict)
+
     if args.recommend:
         from src.stock_engine import StockRecommendationEngine
         from src.model import VADERBaseline
@@ -232,6 +259,21 @@ def main() -> None:
         portfolio.save_portfolio_report(results)
 
     _print_summary(eval_metrics, bt_finbert, keyword_results, time.time() - start_total)
+
+    if macro_snapshot:
+        print(f"  Macro Regime: {macro_snapshot.regime.value.replace('_', ' ').title()}"
+              f"  | VIX: {macro_snapshot.vix:.1f}"
+              f"  | CPI YoY: {macro_snapshot.cpi_yoy:.1%}"
+              f"  | Spread: {macro_snapshot.yield_spread * 10000:.0f}bps")
+    if commodity_snapshot:
+        print(f"  Commodity Stress: {commodity_snapshot.commodity_stress:.2f}"
+              f"  | Oil: ${commodity_snapshot.oil_price:.1f} ({commodity_snapshot.oil_shock.value})"
+              f"  | Gold: ${commodity_snapshot.gold_price:.0f}")
+    if trust_report:
+        print(f"  Model Quality: {trust_report.overall_score:.1f}/10 [{trust_report.verdict}]"
+              f"  | Predictive: {trust_report.predictive_score:.1f}"
+              f"  | Risk: {trust_report.risk_score:.1f}"
+              f"  | Robustness: {trust_report.robustness_score:.1f}")
 
 
 if __name__ == "__main__":

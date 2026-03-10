@@ -1,0 +1,15 @@
+lag,ic,p_value,n,significant,signal
+1,,,7,False,sentiment_only
+2,,,7,False,sentiment_only
+3,,,6,False,sentiment_only
+5,,,6,False,sentiment_only
+10,,,6,False,sentiment_only
+15,,,6,False,sentiment_only
+20,,,6,False,sentiment_only
+1,,,7,False,combined_S40M40V20
+2,,,7,False,combined_S40M40V20
+3,,,6,False,combined_S40M40V20
+5,,,6,False,combined_S40M40V20
+10,,,6,False,combined_S40M40V20
+15,,,6,False,combined_S40M40V20
+20,,,6,False,combined_S40M40V20

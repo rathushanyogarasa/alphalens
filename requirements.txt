@@ -14,3 +14,9 @@ keybert>=0.7.0
 tqdm>=4.65.0
 scipy>=1.11.0
 pathlib>=1.0.1
+feedparser>=6.0.0
+python-dotenv>=1.0.0
+# --- Phase 2 additions ---
+xgboost>=1.7.0             # Enhanced model (SimpleAlphaModel); falls back to sklearn if absent
+openpyxl>=3.1.0            # Excel export in visualisation.py
+pyarrow>=12.0.0            # Parquet caching for macro/commodity snapshots

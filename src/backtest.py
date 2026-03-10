@@ -9,6 +9,8 @@ import logging
 import math
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
@@ -261,14 +263,24 @@ def calculate_strategy_returns(
 
         position = 1 if signal > config.BUY_THRESHOLD else (-1 if signal < config.SELL_THRESHOLD else 0)
 
+        # Transaction costs + slippage (round-trip cost applied at entry)
+        tc_bps = getattr(config, "TRANSACTION_COST_BPS", 10.0)
+        slip_bps = getattr(config, "SLIPPAGE_BPS", 5.0)
+        total_cost = (tc_bps + slip_bps) / 10_000.0  # in fractional return terms
+        cost_drag = abs(position) * total_cost  # cost only on active positions
+
+        net_strategy_return = position * float(next_ret) - cost_drag
+
         rows.append(
             {
                 "date": date,
                 "ticker": ticker,
                 "signal": signal,
                 "position": position,
-                "strategy_return": position * float(next_ret),
+                "strategy_return": net_strategy_return,
+                "gross_strategy_return": position * float(next_ret),
                 "benchmark_return": float(next_ret),
+                "cost_drag": cost_drag,
             }
         )
 
@@ -376,6 +388,23 @@ def calculate_portfolio_metrics(
         beta = float(cov[0, 1] / cov[1, 1])
         alpha = float(ann_return - (config.RISK_FREE_RATE + beta * (bench_total - config.RISK_FREE_RATE)))
 
+    # Turnover: fraction of portfolio changing hands per day
+    position_changes = returns.sort_values(["ticker", "date"])
+    position_changes["pos_change"] = position_changes.groupby("ticker")["position"].diff().fillna(0).abs()
+    daily_turnover = position_changes.groupby("date")["pos_change"].sum()
+    avg_daily_turnover = float(daily_turnover.mean()) if len(daily_turnover) > 0 else 0.0
+    ann_turnover = avg_daily_turnover * _TRADING_DAYS
+
+    # Average holding period (days between position changes per ticker)
+    avg_holding_period = 0.0
+    if total_trades > 0:
+        # Approximate: active days / number of trades
+        active_days = int((returns["position"] != 0).groupby(returns["date"]).any().sum())
+        avg_holding_period = round(active_days / max(1, total_trades), 1)
+
+    # Total cost drag
+    total_cost_drag = float(returns["cost_drag"].sum()) if "cost_drag" in returns.columns else 0.0
+
     metrics = {
         "model_name": model_name,
         "total_return": round(total_return, 4),
@@ -391,6 +420,9 @@ def calculate_portfolio_metrics(
         "beta": round(beta, 4),
         "total_trades": total_trades,
         "n_days": n,
+        "ann_turnover": round(ann_turnover, 2),
+        "avg_holding_period_days": avg_holding_period,
+        "total_cost_drag": round(total_cost_drag, 6),
     }
 
     logger.info(

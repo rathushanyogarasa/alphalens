@@ -1,2 +1,2 @@
 model_name,total_return,benchmark_total_return,annualised_return,annualised_volatility,sharpe_ratio,sortino_ratio,calmar_ratio,max_drawdown,win_rate,alpha,beta,total_trades,n_days
-vader,0.1148,-0.1801,0.1089,0.2305,0.3682,0.3408,0.4478,-0.2432,0.5155,0.0402,-0.1053,194,265
+vader,0.015,0.0066,0.7117,0.1247,4.0077,10.0984,50.9788,-0.014,0.5714,0.7009,0.8911,7,7

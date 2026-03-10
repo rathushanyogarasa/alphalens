@@ -239,18 +239,107 @@ class PortfolioEngine:
     # save_portfolio_report
     # ------------------------------------------------------------------
 
+    # ------------------------------------------------------------------
+    # rank_universe
+    # ------------------------------------------------------------------
+
+    def rank_universe(
+        self,
+        results: list[RecommendationResult],
+        max_positions: int | None = None,
+    ) -> list[dict]:
+        """Rank the universe cross-sectionally and compute position weights.
+
+        Only BUY-rated stocks with MEDIUM or HIGH conviction are included
+        in the long book.  Position weights are proportional to adjusted
+        signal score, capped by ``config.MAX_POSITION_SIZE``, and subject
+        to ``config.MAX_SECTOR_WEIGHT`` concentration limits.
+
+        Args:
+            results:       Output of :meth:`scan`.
+            max_positions: Maximum number of longs.  Defaults to
+                           ``config.MAX_PORTFOLIO_POSITIONS``.
+
+        Returns:
+            list[dict]: Ranked portfolio rows sorted by weight descending.
+            Each row contains ``ticker``, ``recommendation``,
+            ``adjusted_signal_score``, ``conviction_level``,
+            ``position_weight``, ``macro_regime``, ``model_quality_score``.
+        """
+        max_pos = max_positions or getattr(config, "MAX_PORTFOLIO_POSITIONS", 10)
+        max_weight = getattr(config, "MAX_POSITION_SIZE", 0.20)
+        max_sector_w = getattr(config, "MAX_SECTOR_WEIGHT", 0.40)
+        min_quality = getattr(config, "MIN_MODEL_QUALITY_FOR_TRADE", 5.5)
+
+        # Filter to actionable BUYs with at least MEDIUM conviction
+        longs = [
+            r for r in results
+            if r.recommendation == "BUY"
+            and getattr(r, "conviction_level", "LOW") in ("HIGH", "MEDIUM")
+            and (getattr(r, "model_quality_score", 0.0) == 0.0
+                 or getattr(r, "model_quality_score", 0.0) >= min_quality)
+        ]
+
+        if not longs:
+            logger.info("rank_universe: no actionable BUYs after conviction/quality filter")
+            return []
+
+        # Sort by adjusted score descending, take top N
+        longs.sort(key=lambda r: getattr(r, "adjusted_signal_score", r.signal_score), reverse=True)
+        longs = longs[:max_pos]
+
+        # Proportional weights
+        scores = [max(0.0, getattr(r, "adjusted_signal_score", r.signal_score)) for r in longs]
+        total = sum(scores) or 1.0
+        raw_weights = [s / total for s in scores]
+
+        # Cap per-position weight
+        weights = [min(w, max_weight) for w in raw_weights]
+
+        # Renormalise
+        total_w = sum(weights) or 1.0
+        weights = [round(w / total_w, 4) for w in weights]
+
+        rows = []
+        for r, w in zip(longs, weights):
+            rows.append({
+                "ticker":                r.ticker,
+                "recommendation":        r.recommendation,
+                "signal_score":          r.signal_score,
+                "adjusted_signal_score": getattr(r, "adjusted_signal_score", r.signal_score),
+                "conviction_level":      getattr(r, "conviction_level", "LOW"),
+                "position_weight":       w,
+                "macro_regime":          getattr(r, "macro_regime", ""),
+                "model_quality_score":   getattr(r, "model_quality_score", 0.0),
+                "investment_view":       getattr(r, "investment_view", "NEUTRAL"),
+                "tactical_signal":       getattr(r, "tactical_signal", r.recommendation),
+                "confidence":            r.confidence,
+                "risk_flags":            " | ".join(getattr(r, "risk_flags", [])),
+            })
+
+        logger.info(
+            "rank_universe: %d longs | total weight allocated=%.1f%%",
+            len(rows), sum(r["position_weight"] for r in rows) * 100,
+        )
+        return rows
+
+    # ------------------------------------------------------------------
+    # save_portfolio_report
+    # ------------------------------------------------------------------
+
     def save_portfolio_report(
         self,
         results: list[RecommendationResult],
     ) -> None:
         """Persist recommendation results to a timestamped CSV file.
 
-        Saves two files:
+        Saves three files:
 
-        - ``portfolio_YYYYMMDD_HHMM.csv`` — timestamped archive copy.
-        - ``portfolio_recommendations.csv`` — always-current latest copy.
+        - ``portfolio_YYYYMMDD_HHMM.csv`` — full timestamped archive.
+        - ``portfolio_recommendations.csv`` — always-current full copy.
+        - ``portfolio_ranked.csv`` — long-only ranked book with weights.
 
-        Both are written to ``config.RESULTS_DIR``.
+        All files are written to ``config.RESULTS_DIR``.
 
         Args:
             results: List of :class:`~src.stock_engine.RecommendationResult`
@@ -261,20 +350,29 @@ class PortfolioEngine:
         ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
         timestamped_path = config.RESULTS_DIR / f"portfolio_{ts}.csv"
         latest_path = config.RESULTS_DIR / "portfolio_recommendations.csv"
+        ranked_path = config.RESULTS_DIR / "portfolio_ranked.csv"
 
         rows = [
             {
-                "generated_at": r.generated_at.isoformat(),
-                "ticker": r.ticker,
-                "recommendation": r.recommendation,
-                "signal_score": r.signal_score,
-                "confidence": r.confidence,
-                "headline_count": r.headline_count,
+                "generated_at":           r.generated_at.isoformat(),
+                "ticker":                 r.ticker,
+                "recommendation":         r.recommendation,
+                "tactical_signal":        getattr(r, "tactical_signal", r.recommendation),
+                "investment_view":        getattr(r, "investment_view", "NEUTRAL"),
+                "conviction_level":       getattr(r, "conviction_level", "LOW"),
+                "signal_score":           r.signal_score,
+                "adjusted_signal_score":  getattr(r, "adjusted_signal_score", r.signal_score),
+                "confidence":             r.confidence,
+                "model_quality_score":    getattr(r, "model_quality_score", 0.0),
+                "macro_regime":           getattr(r, "macro_regime", ""),
+                "headline_count":         r.headline_count,
                 "confident_headline_count": r.confident_headline_count,
-                "top_positive_keywords": ", ".join(r.top_positive_keywords),
-                "top_negative_keywords": ", ".join(r.top_negative_keywords),
-                "source_breakdown": str(r.source_breakdown),
-                "reasoning": r.reasoning,
+                "top_positive_keywords":  ", ".join(r.top_positive_keywords),
+                "top_negative_keywords":  ", ".join(r.top_negative_keywords),
+                "drivers":                " | ".join(getattr(r, "drivers", [])),
+                "risk_flags":             " | ".join(getattr(r, "risk_flags", [])),
+                "source_breakdown":       str(r.source_breakdown),
+                "reasoning":              r.reasoning,
             }
             for r in results
         ]
@@ -282,6 +380,12 @@ class PortfolioEngine:
         df = pd.DataFrame(rows)
         df.to_csv(timestamped_path, index=False)
         df.to_csv(latest_path, index=False)
+
+        # Ranked book
+        ranked = self.rank_universe(results)
+        if ranked:
+            pd.DataFrame(ranked).to_csv(ranked_path, index=False)
+            logger.info("Ranked portfolio saved → %s (%d positions)", ranked_path.name, len(ranked))
 
         logger.info(
             "Portfolio report saved → %s (and %s)",

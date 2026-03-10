@@ -41,12 +41,15 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 _LOGO = r"""
- ___  _     _          _
-/ _ \| |   | |        | |
-/ /_\ \ |   | |__   __ _| |     ___ _ __  ___
+  ___  _                 _
+ / _ \| |               | |
+/ /_\ \ |   __ __   __ _| |     ___ _ __  ___
 |  _  | |   | '_ \ / _` | |    / _ \ '_ \/ __|
 | | | | |___| |_) | (_| | |___|  __/ | | \__ \
 \_| |_/_____|_.__/ \__,_\_____/\___|_| |_|___/
+            | |
+            |_|
+
 AI-Powered Stock Sentiment Engine v{version}
 """.format(
     version=config.VERSION
@@ -177,7 +180,14 @@ def _get_model_or_vader():
 
     weights = config.MODEL_DIR / "weights.pt"
     if weights.exists():
-        return FinBERTClassifier.load(config.MODEL_DIR)
+        try:
+            return FinBERTClassifier.load(config.MODEL_DIR)
+        except Exception as exc:
+            logger.warning(
+                "Found checkpoint marker but loading failed (%s). Falling back to VADERBaseline.",
+                exc,
+            )
+            return VADERBaseline()
 
     logger.warning(
         "No trained FinBERT model found — falling back to VADERBaseline. "
@@ -198,11 +208,11 @@ def _get_model_or_vader():
 
 
 def _print_result_box(result) -> None:
-    """Print a single-ticker recommendation inside a formatted box.
+    """Print a single-ticker recommendation in institutional output format.
 
-    Displays ticker, recommendation, confidence, signal score, headline
-    counts, top positive/negative keywords with their historical CAR
-    annotations, source breakdown, reasoning, and generation timestamp.
+    Displays ticker, recommendation, confidence, signal score, macro regime,
+    model quality score, drivers, risk flags, keywords with CAR annotations,
+    source breakdown, and reasoning.
 
     Args:
         result: A :class:`~src.stock_engine.RecommendationResult` instance.
@@ -264,20 +274,56 @@ def _print_result_box(result) -> None:
     reasoning_lines = _wrap(result.reasoning, inner - 2)
     generated = result.generated_at.strftime("%Y-%m-%d %H:%M UTC")
 
+    # Phase-2 extended fields (safe defaults for backward compat)
+    macro_regime = getattr(result, "macro_regime", "") or ""
+    model_quality = getattr(result, "model_quality_score", 0.0)
+    drivers = getattr(result, "drivers", []) or []
+    risk_flags = getattr(result, "risk_flags", []) or []
+    adj_score = getattr(result, "adjusted_signal_score", result.signal_score)
+
     rows: list[str] = [
         _hline(_TL, _TR, _BOX_W),
-        _row("AlphaLens - Stock Intelligence", inner),
+        _row("AlphaLens  Institutional Intelligence", inner),
         _row("", inner),
-        _row(f"Ticker:         {result.ticker}", inner),
-        _row(f"Recommendation: {rec}{arrow}", inner),
-        _row(f"Confidence:     {result.confidence:.0%}", inner),
-        _row(f"Signal Score:   {result.signal_score:+.2f}", inner),
+        _row(f"Ticker:           {result.ticker}", inner),
+        _row(f"Recommendation:   {rec}{arrow}", inner),
+        _row(f"Confidence:       {result.confidence:.0%}", inner),
+        _row(f"Signal Score:     {result.signal_score:+.3f}  (adj: {adj_score:+.3f})", inner),
         _row(
-            f"Headlines:      {result.headline_count} analysed "
+            f"Headlines:        {result.headline_count} analysed "
             f"({result.confident_headline_count} conf.)",
             inner,
         ),
     ]
+
+    # Extended Phase-2 fields
+    tactical = getattr(result, "tactical_signal", "")
+    inv_view = getattr(result, "investment_view", "")
+    conviction = getattr(result, "conviction_level", "")
+    if model_quality > 0:
+        rows.append(_row(f"Model Quality:    {model_quality:.1f} / 10", inner))
+    if macro_regime:
+        rows.append(_row(f"Macro Regime:     {macro_regime.replace('_', ' ').title()}", inner))
+    if conviction:
+        rows.append(_row(f"Conviction:       {conviction}", inner))
+    if tactical and inv_view:
+        rows.append(_row(f"Tactical:         {tactical}   |   Inv. View: {inv_view}", inner))
+
+    # Drivers section
+    if drivers:
+        rows.append(_row("", inner))
+        rows.append(_row("Drivers:", inner))
+        for d in drivers[:4]:
+            for dl in _wrap(f"  {_BULLET} {d}", inner - 2):
+                rows.append(_row(dl, inner))
+
+    # Risk flags section
+    if risk_flags:
+        rows.append(_row("", inner))
+        rows.append(_row(f"Risk Flags:  {_WARN}", inner))
+        for rf in risk_flags[:4]:
+            for rfl in _wrap(f"  {_BULLET} {rf}", inner - 2):
+                rows.append(_row(rfl, inner))
 
     # Positive keywords
     if result.top_positive_keywords:

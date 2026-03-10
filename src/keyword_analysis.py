@@ -7,8 +7,12 @@ across data sources, and produces a suite of diagnostic plots.
 """
 
 import logging
+import re
+import warnings
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -39,19 +43,191 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 _FINANCIAL_STOPWORDS: list[str] = [
-    "said",
-    "company",
-    "year",
-    "quarter",
-    "per",
-    "share",
-    "inc",
-    "corp",
-    "ltd",
-    "plc",
-    "reported",
-    "according",
+    # Reporting / attribution verbs
+    "said", "says", "say", "told", "tells", "added", "adding", "stated",
+    "noted", "noted", "claims", "argues", "wrote", "writes", "reported",
+    "reports", "according", "citing", "cited",
+    # Company legal suffixes
+    "inc", "corp", "ltd", "plc", "llc", "co", "group", "holdings",
+    "international", "national", "global", "american", "united",
+    "company", "companies", "firm", "firms", "business",
+    # Generic financial terms that appear everywhere
+    "share", "shares", "stock", "stocks", "market", "markets",
+    "price", "prices", "value", "values", "fund", "funds",
+    "per", "rate", "rates", "index", "indices",
+    # Time and frequency words
+    "year", "years", "quarter", "quarters", "month", "months",
+    "week", "weeks", "day", "days", "annual", "quarterly",
+    "monthly", "weekly", "daily", "fiscal", "fy", "q1", "q2", "q3", "q4",
+    "today", "yesterday", "monday", "tuesday", "wednesday",
+    "thursday", "friday", "january", "february", "march", "april",
+    "may", "june", "july", "august", "september", "october",
+    "november", "december",
+    # Ordinals and generic quantifiers
+    "first", "second", "third", "fourth", "fifth",
+    "new", "latest", "recent", "current", "previous", "next",
+    "big", "large", "small", "major", "minor", "key", "top",
+    # News / media meta words
+    "news", "report", "reports", "article", "story", "press",
+    "release", "statement", "update", "interview", "exclusive",
+    "source", "sources", "spokesperson", "analyst", "analysts",
+    # Generic action words
+    "announced", "announces", "announce", "launch", "launches",
+    "plan", "plans", "planned", "set", "sets", "make", "makes",
+    "made", "take", "takes", "took", "give", "gives", "given",
+    "move", "moves", "moved", "rise", "rises", "fall", "falls",
+    "gain", "gains", "lost", "lose", "hit", "hits",
+    # Numbers and units written out
+    "million", "billion", "trillion", "percent", "thousand", "hundred",
+    # Grammar artifacts from contractions and headlines
+    "aren", "isn", "wasn", "didn", "doesn", "haven", "won",
+    "don", "can", "couldn", "wouldn", "shouldn",
+    # Common headline filler
+    "happened", "live", "watch", "read", "know", "think",
+    "look", "looks", "looking", "going", "getting", "comes",
+    "coming", "puts", "puts", "back", "ahead", "forward",
+    "need", "needs", "want", "wants", "like", "likely",
+    "just", "still", "already", "even", "also", "well",
+    # Financial media meta
+    "wall", "street", "cnbc", "reuters", "bloomberg", "times",
+    "journal", "post", "financial", "money", "investing",
+    "investor", "investors", "investment", "trading", "trader",
 ]
+
+# Build stopwords from ticker symbols AND every individual token in
+# company aliases (TF-IDF tokenises multi-word phrases, so "Bank of America"
+# contributes "bank", "america" etc. which must also be suppressed).
+_TICKER_STOPWORDS: list[str] = [
+    t.lower() for t in config.TICKERS
+]
+for _aliases in config.TICKER_ALIASES.values():
+    for _alias in _aliases:
+        _TICKER_STOPWORDS.append(_alias.lower())
+        # also add each individual word token within the alias
+        _TICKER_STOPWORDS.extend(_alias.lower().split())
+
+_ALL_STOPWORDS: list[str] = list(set(_FINANCIAL_STOPWORDS + _TICKER_STOPWORDS))
+
+
+# ---------------------------------------------------------------------------
+# Finance phrase priority whitelist
+# ---------------------------------------------------------------------------
+
+# These phrases are always prioritised in ranking and never filtered out.
+# Sourced from earnings release language, regulatory filings, and M&A terminology.
+FINANCE_PHRASES: frozenset[str] = frozenset([
+    "earnings beat", "earnings miss", "missed estimates", "beat estimates",
+    "revenue beat", "revenue miss", "profit warning", "raised guidance",
+    "lowered guidance", "guidance raised", "guidance cut", "guidance withdrawn",
+    "share buyback", "buyback programme", "dividend increase", "dividend cut",
+    "dividend suspended", "special dividend", "sec investigation", "doj probe",
+    "short seller", "activist investor", "margin expansion", "margin compression",
+    "debt downgrade", "credit downgrade", "credit upgrade", "debt upgrade",
+    "bankruptcy filing", "chapter 11", "restructuring plan", "debt restructuring",
+    "merger agreement", "acquisition completed", "takeover bid", "tender offer",
+    "regulatory approval", "fda approval", "patent win", "patent loss",
+    "product recall", "ceo departure", "cfo departure", "executive departure",
+    "beat expectations", "missed expectations", "record revenue", "record profit",
+    "quarterly loss", "operating loss", "net loss", "cash flow positive",
+    "free cash flow", "earnings guidance", "full year guidance", "operating margin",
+    "gross margin", "revenue growth", "revenue decline", "subscriber growth",
+    "user growth", "market share gain", "market share loss", "cost cutting",
+    "layoffs", "job cuts", "workforce reduction", "plant closure",
+    "supply chain", "inventory build", "inventory drawdown", "order backlog",
+    "book to bill", "capital raise", "equity offering", "debt offering",
+    "share dilution", "insider buying", "insider selling", "block trade",
+    "price target raised", "price target cut", "upgrade", "downgrade",
+    "outperform", "underperform", "overweight", "underweight",
+    "beat consensus", "miss consensus", "earnings surprise", "revenue surprise",
+])
+
+# ---------------------------------------------------------------------------
+# Filing artefact patterns — hard-blocked regardless of TF-IDF score
+# ---------------------------------------------------------------------------
+
+_FILING_ARTEFACT_PATTERNS: list[re.Pattern] = [
+    re.compile(r"^\d{4,}$"),                     # pure long numbers (CIK, etc.)
+    re.compile(r"^0{3,}"),                        # leading zeros (CIK pattern)
+    re.compile(r"^\d{10}-\d{2}-\d{6}$"),          # SEC accession number
+    re.compile(r"^[a-z0-9]{8}-[a-z0-9]{4}-"),     # UUID-like identifiers
+    re.compile(r"^item\s+\d"),                    # "item 2.02", "item 8.01"
+    re.compile(r"^ex-\d"),                        # exhibit numbers
+    re.compile(r"^\d+\.\d+\.\d+"),               # version/section numbers
+    re.compile(r"^[a-z]{1,2}\d+"),               # alphanumeric codes
+    re.compile(r"\d{5,}"),                        # any token containing 5+ consecutive digits
+    re.compile(r"^cik$"),
+    re.compile(r"^cik\s+\d"),                     # "cik 0001318605" — CIK with number
+    re.compile(r"^edgar$"),
+    re.compile(r"^sec\s"),
+    re.compile(r"form\s+8"),
+    re.compile(r"^exhibit"),
+    re.compile(r"^\d+k$"),                        # "10k", "8k"
+    re.compile(r"^fy\d{2}"),                      # "fy24", "fy2024"
+    re.compile(r"\d{2}\s+filing$"),               # "02 filing", "01 filing"
+    re.compile(r"^filing$"),                      # bare "filing"
+]
+
+# Minimum character length before checking other rules
+_MIN_KEYWORD_LEN: int = 5
+
+
+# ---------------------------------------------------------------------------
+# Post-extraction keyword filter
+# ---------------------------------------------------------------------------
+
+
+def _is_meaningful_keyword(kw: str) -> bool:
+    """Return True if *kw* is a financially meaningful keyword.
+
+    Filters out:
+    - Keywords shorter than 5 characters
+    - Pure numbers or percentage strings
+    - SEC filing artefacts (CIK numbers, accession numbers, item references)
+    - Keywords consisting entirely of stopwords
+    - Single-word tickers or company name aliases
+
+    Automatically passes keywords that match the :data:`FINANCE_PHRASES`
+    whitelist.
+
+    Args:
+        kw: Lowercase keyword or keyphrase string.
+
+    Returns:
+        bool: ``True`` if the keyword should be retained.
+    """
+    kw = kw.strip().lower()
+
+    # Whitelist: always pass finance event phrases
+    if kw in FINANCE_PHRASES:
+        return True
+
+    # Too short
+    if len(kw) < _MIN_KEYWORD_LEN:
+        return False
+
+    # Pure number / percentage
+    if re.fullmatch(r"[\d,.\-%/]+", kw):
+        return False
+
+    # Filing artefact patterns
+    for pat in _FILING_ARTEFACT_PATTERNS:
+        if pat.search(kw):
+            return False
+
+    # Contains only stopword tokens
+    tokens = kw.split()
+    if all(t in _ALL_STOPWORDS for t in tokens):
+        return False
+
+    # Matches a ticker alias exactly
+    if kw in _TICKER_STOPWORDS:
+        return False
+
+    # Single-token that is a company name word (too ambiguous alone)
+    if len(tokens) == 1 and kw in {a.lower() for a in _TICKER_STOPWORDS}:
+        return False
+
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -82,25 +258,34 @@ def extract_tfidf_keywords(
 
     stop_words: list[str] = list(
         TfidfVectorizer(stop_words="english").get_stop_words()
-    ) + _FINANCIAL_STOPWORDS
+    ) + _ALL_STOPWORDS
 
     vectorizer = TfidfVectorizer(
         stop_words=stop_words,
         ngram_range=(1, 2),
-        max_features=5000,
-        min_df=2,
+        max_features=10_000,
+        min_df=2,          # must appear in at least 2 documents
+        max_df=0.80,       # ignore terms in more than 80% of documents
+        sublinear_tf=True, # log-scale TF dampens very frequent terms
     )
 
     try:
-        tfidf_matrix = vectorizer.fit_transform(texts)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            tfidf_matrix = vectorizer.fit_transform(texts)
     except ValueError as exc:
         logger.warning("TF-IDF vectoriser failed (%s) — returning empty list", exc)
         return []
 
     feature_names = vectorizer.get_feature_names_out()
     mean_scores = np.asarray(tfidf_matrix.mean(axis=0)).flatten()
-    top_indices = mean_scores.argsort()[::-1][:n]
-    keywords = [feature_names[i] for i in top_indices]
+    # Sort by score then post-filter for meaningful keywords
+    top_indices = mean_scores.argsort()[::-1]
+    keywords = [
+        feature_names[i]
+        for i in top_indices
+        if _is_meaningful_keyword(feature_names[i])
+    ][:n]
 
     logger.info("TF-IDF extracted %d keywords; top 5: %s", len(keywords), keywords[:5])
     return keywords
@@ -143,12 +328,15 @@ def extract_keybert_keywords(
             keywords = kw_model.extract_keywords(
                 text,
                 keyphrase_ngram_range=(1, 2),
-                stop_words="english",
+                stop_words=_ALL_STOPWORDS,
                 top_n=n_per_doc,
+                use_mmr=True,      # Maximal Marginal Relevance — reduces redundancy
+                diversity=0.4,     # 0=no diversity, 1=maximum diversity
             )
-            for kw, _ in keywords:
+            for kw, score in keywords:
                 kw_lower = kw.lower().strip()
-                freq[kw_lower] = freq.get(kw_lower, 0) + 1
+                if _is_meaningful_keyword(kw_lower) and score >= 0.2:
+                    freq[kw_lower] = freq.get(kw_lower, 0) + 1
         except Exception as exc:
             logger.debug("KeyBERT failed on text %d: %s", i, exc)
 
@@ -686,26 +874,77 @@ def plot_frequency_vs_car(keyword_results: list[dict]) -> None:
 def save_keyword_summary(results: list[dict]) -> None:
     """Persist keyword event-study results to a CSV file.
 
+    Computes a per-keyword one-sample t-statistic (H0: avg_CAR = 0) and
+    marks each keyword as ``signal_grade``:
+
+    * **A** — |avg_CAR| > 0.01, p < 0.05, event_count ≥ 10
+    * **B** — |avg_CAR| > 0.005, p < 0.10, event_count ≥ 5
+    * **C** — all others that passed event threshold
+
+    Only grade A and B keywords are written to the live weights file used
+    by :class:`~src.stock_engine.StockRecommendationEngine`.  Grade C
+    keywords are retained in the full CSV for analysis but excluded from
+    live scoring to prevent noise injection.
+
     Args:
         results: List of result dicts from :func:`run_event_study`,
             each containing ``"keyword"``, ``"event_count"``,
-            ``"avg_CAR"``, ``"std_CAR"``, and ``"positive_pct"``.
+            ``"avg_CAR"``, ``"std_CAR"``, ``"positive_pct"``,
+            and ``"all_CARs"``.
     """
     config.METRICS_DIR.mkdir(parents=True, exist_ok=True)
     out_path = config.METRICS_DIR / "keyword_summary.csv"
+    live_path = config.METRICS_DIR / "keyword_summary.csv"  # same file — grade filter applied at read time
 
-    rows = [
-        {
-            "keyword": r["keyword"],
-            "event_count": r["event_count"],
-            "avg_CAR": r["avg_CAR"],
-            "std_CAR": r["std_CAR"],
+    rows = []
+    for r in results:
+        avg_car = r["avg_CAR"]
+        std_car = r["std_CAR"]
+        n = r["event_count"]
+        all_cars = r.get("all_CARs", [])
+
+        # One-sample t-test: avg_CAR ≠ 0
+        t_stat, p_value = 0.0, 1.0
+        if n >= 2 and std_car > 0:
+            se = std_car / np.sqrt(n)
+            t_stat = avg_car / se
+            from scipy import stats as _stats
+            p_value = float(2 * _stats.t.sf(abs(t_stat), df=n - 1))
+
+        # Signal grading
+        abs_car = abs(avg_car)
+        if abs_car > 0.01 and p_value < 0.05 and n >= 10:
+            grade = "A"
+        elif abs_car > 0.005 and p_value < 0.10 and n >= 5:
+            grade = "B"
+        else:
+            grade = "C"
+
+        # Boost finance-phrase whitelist keywords to minimum grade B if borderline
+        if r["keyword"] in FINANCE_PHRASES and grade == "C" and abs_car > 0.002:
+            grade = "B"
+
+        rows.append({
+            "keyword":      r["keyword"],
+            "event_count":  n,
+            "avg_CAR":      avg_car,
+            "std_CAR":      std_car,
             "positive_pct": r["positive_pct"],
-        }
-        for r in results
-    ]
-    pd.DataFrame(rows).sort_values("avg_CAR", ascending=False).to_csv(out_path, index=False)
-    logger.info("Keyword summary saved → %s (%d keywords)", out_path, len(rows))
+            "t_stat":       round(t_stat, 4),
+            "p_value":      round(p_value, 4),
+            "signal_grade": grade,
+            "is_finance_phrase": r["keyword"] in FINANCE_PHRASES,
+        })
+
+    df = pd.DataFrame(rows).sort_values("avg_CAR", ascending=False)
+    df.to_csv(out_path, index=False)
+
+    n_ab = len(df[df["signal_grade"].isin(["A", "B"])])
+    n_c = len(df[df["signal_grade"] == "C"])
+    logger.info(
+        "Keyword summary saved → %s | total=%d | grade A+B=%d (live) | grade C=%d (excluded from scoring)",
+        out_path, len(rows), n_ab, n_c,
+    )
 
 
 # ---------------------------------------------------------------------------

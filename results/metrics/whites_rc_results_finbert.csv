@@ -1,0 +1,2 @@
+best_strategy,best_sharpe,p_value,boot_mean,boot_std,boot_95pct,n_strategies,n_periods,n_boot,model
+A_baseline|S30+M50+V20,1.9821,0.691,2.7445,1.4957,5.2293,84,36,2000,finbert
