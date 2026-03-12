@@ -1,0 +1,16 @@
+model,period,scenario,annualised_return,sharpe_ratio,max_drawdown,win_rate,ic,avg_turnover,trade_count,participation_proxy_mean,hold_days,quantile_cutoff,confidence_threshold,variant,regime_filter
+vader,2026Q1,ablation_sentiment,-0.3963,-1.7984,-0.0545,0.4375,-0.0603,,40,,2,0.25,0.75,sentiment,False
+vader,2026Q1,ablation_ensemble,-0.4712,-1.3726,-0.1528,0.4375,0.045,,40,,2,0.25,0.75,ensemble,False
+vader,2026Q1,ablation_ensemble_regime,-0.4712,-1.3726,-0.1528,0.4375,0.045,,40,,2,0.25,0.75,ensemble,True
+finbert,2025Q2,ablation_sentiment,5240.9148,0.0,0.0,1.0,,,2,,2,0.15,0.6,sentiment,False
+finbert,2025Q2,ablation_ensemble,28999069.2396,0.0,0.0,1.0,,,2,,2,0.15,0.6,ensemble,False
+finbert,2025Q2,ablation_ensemble_regime,28999069.2396,0.0,0.0,1.0,,,2,,2,0.15,0.6,ensemble,True
+finbert,2025Q3,ablation_sentiment,10.4171,0.0,0.0,1.0,,,2,,2,0.15,0.6,sentiment,False
+finbert,2025Q3,ablation_ensemble,-0.8756,0.0,0.0,0.0,,,2,,2,0.15,0.6,ensemble,False
+finbert,2025Q3,ablation_ensemble_regime,-0.8756,0.0,0.0,0.0,,,2,,2,0.15,0.6,ensemble,True
+finbert,2025Q4,ablation_sentiment,-0.5204,-3.8892,-0.0415,0.25,-0.0268,,132,,2,0.15,0.6,sentiment,False
+finbert,2025Q4,ablation_ensemble,-0.3288,-2.5102,-0.0465,0.5,0.0714,,132,,2,0.15,0.6,ensemble,False
+finbert,2025Q4,ablation_ensemble_regime,-0.3288,-2.5102,-0.0465,0.5,0.0714,,132,,2,0.15,0.6,ensemble,True
+finbert,2026Q1,ablation_sentiment,-0.6151,-6.3014,-0.1576,0.3878,-0.0027,,804,,1,0.15,0.75,sentiment,False
+finbert,2026Q1,ablation_ensemble,-0.4897,-4.7211,-0.1353,0.4286,0.0634,,804,,1,0.15,0.75,ensemble,False
+finbert,2026Q1,ablation_ensemble_regime,-0.4897,-4.7211,-0.1353,0.4286,0.0634,,804,,1,0.15,0.75,ensemble,True

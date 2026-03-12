@@ -43,11 +43,14 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--stages",
         type=str,
-        default="data,sources,train,evaluate,backtest,keywords,macro,commodities,trust,recommend",
+        default="data,sources,train,evaluate,backtest,keywords,macro,commodities,trust,recommend,diagnostics",
         help="Comma-separated stages to run",
     )
     parser.add_argument("--recommend", type=str, default="", help="Ticker to recommend")
     parser.add_argument("--portfolio", action="store_true")
+    parser.add_argument("--data-mode", choices=["offline_snapshot", "live"], default="offline_snapshot")
+    parser.add_argument("--strict-data", action="store_true")
+    parser.add_argument("--report-out", type=str, default="")
     return parser.parse_args()
 
 
@@ -222,6 +225,20 @@ def main() -> None:
 
         commodity_snapshot = _run_stage("Commodity Data", run_commodity_data)
 
+    if "diagnostics" in stages:
+        from run_performance_diagnostics import run_diagnostics
+
+        _run_stage(
+            "Bank Diagnostics",
+            lambda: run_diagnostics(
+                data_mode=args.data_mode,
+                strict_data=args.strict_data,
+                report_out=args.report_out,
+                build_snapshot=(args.data_mode == "live"),
+                capital_usd=1_000_000.0,
+                max_participation=0.02,
+            ),
+        )
     if "trust" in stages:
         from src.model_trust import run_trust_scoring
 

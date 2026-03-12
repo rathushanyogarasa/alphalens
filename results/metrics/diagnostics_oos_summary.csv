@@ -1,0 +1,5 @@
+model,scenario,annualised_return,sharpe_ratio,max_drawdown,win_rate,trade_count,avg_turnover,ic,ic_stability,oos_fold_count,pct_positive_oos_folds,break_even_cost_bps,data_coverage_ratio
+finbert,baseline,-0.1603,-1.358,-0.0881,0.4857,744,,-0.0018000000000000013,0.032102647865869256,4,0.0,0.0,1.0
+finbert,improved_no_regime_uplift,-0.477,-3.6524,-0.173,0.4068,940,,0.018299999999999997,0.0637810316630266,4,0.0,0.0,1.0
+vader,baseline,0.0582,0.2145,-0.1174,0.4444,44,,0.0975,,1,1.0,0.0,1.0
+vader,improved_no_regime_uplift,-0.4712,-1.3726,-0.1528,0.4375,40,,0.045,,1,0.0,0.0,1.0

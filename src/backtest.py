@@ -47,6 +47,7 @@ def fetch_price_data(
     tickers: list[str],
     start: str,
     end: str,
+    allow_synthetic: bool = True,
 ) -> pd.DataFrame:
     """Fetch adjusted close prices for a list of tickers via yfinance.
 
@@ -79,6 +80,9 @@ def fetch_price_data(
         raw = pd.DataFrame()
 
     if raw.empty:
+        if not allow_synthetic:
+            logger.error("yfinance returned empty DataFrame and synthetic fallback is disabled")
+            return pd.DataFrame()
         logger.warning("yfinance returned empty DataFrame; generating synthetic prices")
         dates = pd.bdate_range(start=start, end=end)
         rng = np.random.default_rng(config.RANDOM_SEED)
@@ -333,7 +337,8 @@ def calculate_portfolio_metrics(
             - ``alpha`` (float): Jensen's alpha vs benchmark.
             - ``beta`` (float): Market beta.
             - ``total_trades`` (int)
-            - ``n_days`` (int): Number of unique signal dates.
+            - `
+_days`` (int): Number of unique signal dates.
     """
     _zero: dict = {
         "model_name": model_name,

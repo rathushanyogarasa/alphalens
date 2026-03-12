@@ -422,6 +422,9 @@ METRICS_DIR: Path = RESULTS_DIR / "metrics"
 MODEL_DIR: Path = RESULTS_DIR / "best_model"
 """Directory where the best fine-tuned model checkpoint is saved."""
 
+RESEARCH_DATA_DIR: Path = PROCESSED_DATA_DIR / "research_dataset_pack"
+"""Deterministic offline dataset pack for reproducible research diagnostics."""
+
 # ---------------------------------------------------------------------------
 # Ensure all directories exist on import
 # ---------------------------------------------------------------------------
@@ -434,5 +437,6 @@ for _dir in (
     PLOTS_DIR,
     METRICS_DIR,
     MODEL_DIR,
+    RESEARCH_DATA_DIR,
 ):
     _dir.mkdir(parents=True, exist_ok=True)

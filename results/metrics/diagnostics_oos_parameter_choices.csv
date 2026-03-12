@@ -1,0 +1,6 @@
+model,test_period,confidence_threshold,quantile_cutoff,hold_days,variant,regime_filter,score,train_sharpe
+vader,2026Q1,0.75,0.25,2,ensemble,False,3.9586,3.9586
+finbert,2025Q2,0.6,0.15,2,sentiment,False,-1.1899,-1.1899
+finbert,2025Q3,0.6,0.15,2,ensemble,False,-0.7636,-0.7636
+finbert,2025Q4,0.6,0.15,2,sentiment,False,0.7593,0.7593
+finbert,2026Q1,0.75,0.15,1,ensemble,False,2.7011,2.7011
