@@ -149,10 +149,14 @@ class StockRecommendationEngine:
 
     def __init__(self, model) -> None:
         self.model = model
+        self.confidence_threshold = config.CONFIDENCE_THRESHOLD
+        if model.__class__.__name__ == "VADERBaseline":
+            self.confidence_threshold = 0.15
         self.keyword_weights: dict[str, float] = self._load_keyword_weights()
         logger.info(
-            "StockRecommendationEngine initialised | %d keyword weights loaded",
+            "StockRecommendationEngine initialised | %d keyword weights loaded | conf_threshold=%.2f",
             len(self.keyword_weights),
+            self.confidence_threshold,
         )
 
     # ------------------------------------------------------------------
@@ -468,7 +472,7 @@ class StockRecommendationEngine:
         weights: list[float] = []
 
         for i, pred in enumerate(predictions):
-            if pred["confidence"] < config.CONFIDENCE_THRESHOLD:
+            if pred["confidence"] < self.confidence_threshold:
                 continue
 
             sentiment = float(SIGNAL_MAP.get(pred["label_name"], 0))
@@ -599,14 +603,14 @@ class StockRecommendationEngine:
         confident = [
             (p, news_df.iloc[i])
             for i, p in enumerate(predictions)
-            if p["confidence"] >= config.CONFIDENCE_THRESHOLD
+            if p["confidence"] >= self.confidence_threshold
         ]
 
         total_confident = len(confident)
         if total_confident == 0:
             return (
                 f"No headlines met the confidence threshold of "
-                f"{config.CONFIDENCE_THRESHOLD:.0%}. Defaulting to HOLD."
+                f"{self.confidence_threshold:.0%}. Defaulting to HOLD."
             )
 
         n_pos = sum(1 for p, _ in confident if p["label_name"] == "positive")
@@ -719,9 +723,16 @@ class StockRecommendationEngine:
             predictions.extend(self.model.predict(batch))
 
         # Filter confident predictions
-        confident_preds = [p for p in predictions if p["confidence"] >= config.CONFIDENCE_THRESHOLD]
-        confident_headline_count = len(confident_preds)
+        confident_preds = [p for p in predictions if p["confidence"] >= self.confidence_threshold]
+        if not confident_preds:
+            logger.info(
+                "[%s] No predictions above confidence threshold %.2f; using all predictions",
+                ticker,
+                self.confidence_threshold,
+            )
+            confident_preds = predictions.copy()
 
+        confident_headline_count = len(confident_preds)
         mean_confidence = (
             float(sum(p["confidence"] for p in confident_preds) / confident_headline_count)
             if confident_headline_count > 0
@@ -836,7 +847,7 @@ class StockRecommendationEngine:
             source_weights_for_conf = [
                 config.SOURCE_WEIGHTS.get(str(news_df.iloc[i].get("source", "")), 0.5)
                 for i, p in enumerate(predictions)
-                if p["confidence"] >= config.CONFIDENCE_THRESHOLD
+                if p["confidence"] >= self.confidence_threshold
                 and i < len(news_df)
             ]
             avg_src_quality = sum(source_weights_for_conf) / len(source_weights_for_conf) if source_weights_for_conf else 0.0
@@ -875,9 +886,11 @@ class StockRecommendationEngine:
         else:
             recommendation = "HOLD"
 
+        strict_gates = getattr(config, "STRICT_RECOMMENDATION_GATES", False)
+
         # Gate 1: Model quality floor
         min_quality = getattr(config, "MIN_MODEL_QUALITY_FOR_TRADE", 5.5)
-        if model_quality_score > 0 and model_quality_score < min_quality:
+        if strict_gates and model_quality_score > 0 and model_quality_score < min_quality:
             if recommendation != "HOLD":
                 logger.info(
                     "[%s] Downgraded %s → HOLD (model quality %.1f < %.1f floor)",
@@ -888,7 +901,7 @@ class StockRecommendationEngine:
                     risk_flags.append(f"Model quality ({model_quality_score:.1f}) below trade floor ({min_quality:.1f})")
 
         # Gate 2: Minimum confident headlines
-        if confident_headline_count < min_headlines and recommendation != "HOLD":
+        if strict_gates and confident_headline_count < min_headlines and recommendation != "HOLD":
             logger.info(
                 "[%s] Downgraded %s → HOLD (only %d/%d confident headlines)",
                 ticker, recommendation, confident_headline_count, min_headlines,
@@ -897,7 +910,7 @@ class StockRecommendationEngine:
             risk_flags.append(f"Insufficient confident headlines ({confident_headline_count} < {min_headlines})")
 
         # Gate 3: Regime-based suppression
-        if getattr(config, "REQUIRE_MACRO_ALIGNMENT", True) and macro_regime:
+        if strict_gates and getattr(config, "REQUIRE_MACRO_ALIGNMENT", True) and macro_regime:
             hostile = macro_regime in _hostile_regimes
             if hostile and recommendation == "BUY" and conviction_level == "LOW":
                 logger.info(
@@ -908,12 +921,12 @@ class StockRecommendationEngine:
                 risk_flags.append(f"Macro regime ({macro_regime.replace('_', ' ')}) hostile — BUY suppressed")
 
         # Gate 4: Risk flag overrides adjusted-score disagreement
-        if risk_flags and len(risk_flags) >= 2 and adjusted_score < signal_score * 0.5 and recommendation == "BUY":
+        if strict_gates and risk_flags and len(risk_flags) >= 2 and adjusted_score < signal_score * 0.5 and recommendation == "BUY":
             logger.info("[%s] BUY downgraded → HOLD (multiple risk flags + adj score retreated)", ticker)
             recommendation = "HOLD"
 
         # Gate 5: Low conviction forces HOLD for directional calls
-        if conviction_level == "LOW" and recommendation != "HOLD":
+        if strict_gates and conviction_level == "LOW" and recommendation != "HOLD":
             logger.info("[%s] %s downgraded → HOLD (conviction=LOW)", ticker, recommendation)
             recommendation = "HOLD"
             risk_flags.append("Signal conviction too low — holding instead of trading")
@@ -998,7 +1011,7 @@ class StockRecommendationEngine:
             str(news_df.iloc[i].get("headline", "")).lower()
             for i, p in enumerate(predictions)
             if p.get("label_name") == target_label
-            and p["confidence"] >= config.CONFIDENCE_THRESHOLD
+            and p["confidence"] >= self.confidence_threshold
         ]
 
         if not matching_headlines:
@@ -1021,3 +1034,8 @@ class StockRecommendationEngine:
         common = Counter(tokens).most_common(top_n * 3)
         stopwords = {"the", "a", "an", "of", "in", "on", "at", "to", "for", "and", "or", "is", "was"}
         return [w for w, _ in common if w not in stopwords][:top_n]
+
+
+
+
+

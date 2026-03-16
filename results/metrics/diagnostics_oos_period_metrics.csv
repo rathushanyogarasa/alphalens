@@ -1,11 +1,9 @@
 model,period,scenario,annualised_return,sharpe_ratio,max_drawdown,win_rate,ic,avg_turnover,trade_count,participation_proxy_mean,hold_days,quantile_cutoff,confidence_threshold,variant,regime_filter
-vader,2026Q1,baseline,0.0582,0.2145,-0.1174,0.4444,0.0975,,44,,2,0.2,0.7,sentiment,False
+vader,2026Q1,baseline,-0.0446,-1.4826,-0.0199,0.5,0.0936,,20,,2,0.2,0.7,sentiment,False
 vader,2026Q1,improved,-0.4712,-1.3726,-0.1528,0.4375,0.045,,40,,2,0.25,0.75,ensemble,False
-finbert,2025Q2,baseline,5240.9148,0.0,0.0,1.0,,,2,,2,0.2,0.7,sentiment,False
-finbert,2025Q2,improved,5240.9148,0.0,0.0,1.0,,,2,,2,0.15,0.6,sentiment,False
-finbert,2025Q3,baseline,10.4171,0.0,0.0,1.0,,,2,,2,0.2,0.7,sentiment,False
-finbert,2025Q3,improved,-0.8756,0.0,0.0,0.0,,,2,,2,0.15,0.6,ensemble,False
+finbert,2025Q2,improved,10367.3692,0.0,0.0,1.0,,,2,,1,0.15,0.6,ensemble,False
+finbert,2025Q3,improved,-0.8756,0.0,0.0,0.0,,,2,,2,0.15,0.6,ensemble,True
 finbert,2025Q4,baseline,-0.5596,-5.6989,-0.0439,0.375,-0.0245,,174,,2,0.2,0.7,sentiment,False
-finbert,2025Q4,improved,-0.5204,-3.8892,-0.0415,0.25,-0.0268,,132,,2,0.15,0.6,sentiment,False
+finbert,2025Q4,improved,-0.5698,-8.2178,-0.0633,0.375,0.0086,,272,,1,0.15,0.6,ensemble,False
 finbert,2026Q1,baseline,-0.1831,-1.7621,-0.082,0.48,0.0209,,566,,2,0.2,0.7,sentiment,False
 finbert,2026Q1,improved,-0.4897,-4.7211,-0.1353,0.4286,0.0634,,804,,1,0.15,0.75,ensemble,False

@@ -164,3 +164,15 @@
 2026-03-10 02:06:59 | INFO     | alphalens.pipeline | Running stages: ['train']
 2026-03-10 02:07:03 | INFO     | alphalens.pipeline | === Stage: Training ===
 2026-03-10 03:03:20 | INFO     | alphalens.pipeline | === Stage complete: Training (56m 17s) ===
+2026-03-15 17:50:03 | INFO     | alphalens.pipeline | QUICK_TEST enabled
+2026-03-15 17:50:03 | INFO     | alphalens.pipeline | Running stages: ['data', 'evaluate']
+2026-03-15 17:50:20 | INFO     | alphalens.pipeline | === Stage: Data Preparation ===
+2026-03-15 17:50:20 | INFO     | alphalens.pipeline | === Stage complete: Data Preparation (0m 0s) ===
+2026-03-15 17:50:31 | INFO     | alphalens.pipeline | === Stage: Evaluation ===
+2026-03-15 17:50:32 | INFO     | alphalens.pipeline | === Stage complete: Evaluation (0m 1s) ===
+2026-03-15 18:52:56 | INFO     | alphalens.pipeline | QUICK_TEST enabled
+2026-03-15 18:52:56 | INFO     | alphalens.pipeline | Running stages: ['data', 'evaluate']
+2026-03-15 18:52:58 | INFO     | alphalens.pipeline | === Stage: Data Preparation ===
+2026-03-15 18:52:58 | INFO     | alphalens.pipeline | === Stage complete: Data Preparation (0m 0s) ===
+2026-03-15 18:53:00 | INFO     | alphalens.pipeline | === Stage: Evaluation ===
+2026-03-15 18:53:01 | INFO     | alphalens.pipeline | === Stage complete: Evaluation (0m 0s) ===

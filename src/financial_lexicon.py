@@ -176,7 +176,7 @@ BEARISH_KEYWORDS: dict[str, float] = {
     "debt crisis": -4,
     "credit crisis": -4,
     "rating downgrade": -4,
-    "downgraded": -3,
+    "rating downgraded": -3,
     # --- Legal & Regulatory Problems (-3 to -5) ---
     "sec investigation": -5,
     "sec probe": -5,

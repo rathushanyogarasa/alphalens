@@ -283,6 +283,30 @@ def run_longshort_backtest(
         logger.warning("No signals after confidence filter — returning empty results")
         return pd.DataFrame(), {}
 
+    # Need at least 2 tickers per rebalance date to form a long AND short leg.
+    # Calling rank_cross_section on 1-3 rows produces degenerate quantiles and
+    # fires spurious "No completed long-short positions" warnings.
+    min_tickers_required = max(
+        4, math.ceil(2 / max(getattr(config, "LONGSHORT_QUANTILE_CUTOFF", 0.20), 0.01))
+    )
+    ticker_counts = signals.groupby("date")["ticker"].nunique()
+    usable_dates = ticker_counts[ticker_counts >= min_tickers_required].index
+    if usable_dates.empty:
+        logger.debug(
+            "run_longshort_backtest: no dates have >= %d tickers after confidence "
+            "filter (max was %d). Dataset too small for long-short — skipping.",
+            min_tickers_required,
+            int(ticker_counts.max()) if not ticker_counts.empty else 0,
+        )
+        return pd.DataFrame(), {}
+    dropped = len(ticker_counts) - len(usable_dates)
+    if dropped > 0:
+        logger.info(
+            "Long-short: dropped %d/%d dates with fewer than %d tickers",
+            dropped, len(ticker_counts), min_tickers_required,
+        )
+    signals = signals[signals["date"].isin(usable_dates)]
+
     signals["date"] = pd.to_datetime(signals["date"])
     price_sorted    = prices.sort_index()
     all_dates       = sorted(signals["date"].unique())

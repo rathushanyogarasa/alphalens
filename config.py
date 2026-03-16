@@ -179,11 +179,13 @@ MARKET_BENCHMARK: str = "SPY"
 
 TRANSACTION_COST_BPS: float = 10.0
 """Round-trip transaction cost in basis points applied per trade in backtest.
-10 bps = 0.10% per side (entry + exit).  Set to 0.0 to disable."""
+10 bps = 0.10% total round-trip (entry + exit combined), charged once per
+position change.  Set to 0.0 to disable."""
 
 SLIPPAGE_BPS: float = 5.0
-"""Estimated slippage in basis points applied per trade entry/exit.
-5 bps is conservative for liquid large-caps."""
+"""Estimated slippage in basis points applied per trade round-trip.
+5 bps is conservative for liquid large-caps; charged once at entry alongside
+TRANSACTION_COST_BPS."""
 
 MAX_POSITION_SIZE: float = 0.20
 """Maximum single-position weight in the portfolio (0.20 = 20%)."""
