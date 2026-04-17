@@ -464,13 +464,40 @@ def _compute_metrics(net_returns: pd.Series, returns_df: pd.DataFrame, hold_days
     if net_returns.empty:
         return {}
 
-    # Annualisation factor: periods per year
     periods_per_year = _TRADING_DAYS / hold_days
     n = len(net_returns)
 
-    total_ret  = float((1 + net_returns).prod() - 1)
-    ann_ret    = float((1 + total_ret) ** (periods_per_year / max(n, 1)) - 1)
-    ann_vol    = float(net_returns.std() * math.sqrt(periods_per_year))
+    total_ret = float((1 + net_returns).prod() - 1)
+
+    # Annualise using the actual calendar span (first entry → last exit) rather
+    # than (periods_per_year / n).  The naive formula raises a small positive
+    # return to a very high power when n is tiny — e.g. n=1, hold_days=2 gives
+    # exponent=126, turning a single +8.8% 2-day return into +42,000% annualised.
+    _has_dates = (
+        not returns_df.empty
+        and "entry_date" in returns_df.columns
+        and "exit_date" in returns_df.columns
+    )
+    if _has_dates:
+        _first = pd.to_datetime(returns_df["entry_date"]).min()
+        _last  = pd.to_datetime(returns_df["exit_date"]).max()
+        _cal_days = max((_last - _first).days, n * hold_days)
+        _trading_days_spanned = max(round(_cal_days * _TRADING_DAYS / 365), n * hold_days, 1)
+    else:
+        _trading_days_spanned = max(n * hold_days, 1)
+
+    if _trading_days_spanned < 20:
+        # Fewer than ~1 month of data — extrapolating to a year would be meaningless.
+        ann_ret = total_ret
+        logger.debug(
+            "_compute_metrics: ~%d trading days spanned; reporting total_return "
+            "without annualisation (total_ret=%+.4f)",
+            _trading_days_spanned, total_ret,
+        )
+    else:
+        ann_ret = float((1 + total_ret) ** (_TRADING_DAYS / _trading_days_spanned) - 1)
+
+    ann_vol = float(net_returns.std() * math.sqrt(periods_per_year))
 
     daily_rf   = config.RISK_FREE_RATE / _TRADING_DAYS
     period_rf  = config.RISK_FREE_RATE / periods_per_year
